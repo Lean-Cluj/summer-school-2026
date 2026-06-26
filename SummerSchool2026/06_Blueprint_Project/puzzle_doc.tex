@@ -1,0 +1,344 @@
+\documentclass[11pt]{amsart}
+
+\usepackage{amssymb, amsthm, amsmath}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    pdftitle={The (Almost) Impossible Puzzle},
+    pdfpagemode=UseNone,
+    }
+
+
+\usepackage[showmore, dep_graph]{blueprint}
+\usepackage{xcolor}
+
+\usepackage{showkeys}
+
+\input{macros/common}
+\input{macros/web}
+
+\title{The (Almost) Impossible Puzzle}
+% \author{Mihai}
+
+
+% \documentclass[11pt]{amsart}
+% \usepackage{amssymb}
+
+\newcommand{\Zz}{\mathbb{Z}_2}
+\newcommand{\Fin}{\mathrm{Fin}\,}
+\newcommand{\B}{\color{blue}}
+
+\begin{document}
+
+\begin{abstract}
+Tom, Jerry and Spike play the following game. 
+Tom generates a random binary code of length $n$, 
+which he sends to Spike along with a \textit{secret number} 
+between 0 and $n-1$. Spike flips exactly one bit in the code 
+and then sends only the modified binary code to Jerry. 
+Is there a pre-established strategy for Spike and Jerry 
+such that Jerry can determine the \textit{secret number} 
+solely by looking at the code sent by Spike?
+\end{abstract}
+
+\maketitle
+
+\bigskip
+
+\section{Definitions}
+
+\bigskip
+
+\begin{definition}
+\href{https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html#Fin}{$\Fin$}$ n :=\{0,\ldots,n-1\}$, $n\in\mathbb{N}$ 
+($\Fin 0 := \emptyset$). $\Zz := \{0,1\}$ is the \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Ring/Defs.html#CommRing}{commutative ring} of \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/ZMod/Defs.html#ZMod}{integers modulo} $2$.
+\end{definition}
+
+\medskip
+
+\begin{definition}
+$\Zz^n := \Zz\times...\times\Zz$. $\Zz^n$ can be seen as the set of all functions from $\Fin n$ to $\Zz$. In this file, we consider $\Zz^n$ as a \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Module/Defs.html#Module}{module} over $\Zz$.
+\end{definition}
+
+\medskip
+
+\begin{definition}
+For $i\in \Fin n$, let ${\rm e}_i\in\Zz^n$ be the canonical vector with 
+$1$ on the $i$-th position and zeros elsewhere
+\begin{equation}
+\tag{e}
+\label{e}
+{\rm e}_i := (0,\ldots,0,1,0,\ldots,0),
+\end{equation}
+${\rm e}_i$ can be also seen as the \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Notation/Pi/Basic.html#Pi.single}{function defined on $\Fin n$, 
+supported at $i$, with value $1$ there, and $0$ elsewhere.}
+
+
+Note that $b+{\rm e}_i$ is the code $b$ with the $i$-th bit flipped, 
+for every $b\in\Zz^n$ and $i\in \Fin n$.
+\end{definition}
+
+\medskip
+
+\begin{definition}
+We say that $f:\Zz^n \to \Fin n$ is a {\bf strategy function}, if 
+\begin{equation}
+\label{SF}
+\tag{SF}
+\forall\, b\in\Zz^n, k\in\Fin n, \exists\, i \in \Fin n, f(b+{\rm e}_i) = k.
+\end{equation}
+
+We say that the puzzle {\bf has a strategy} for $n$ if
+$$\exists f: \Zz^n \to \Fin n, \; \eqref{SF}.$$
+\end{definition}
+
+\medskip
+
+\begin{definition}
+Let $\delta: \Fin n \times \Fin n \to \mathbb{N}$ be given by
+\begin{equation}
+\tag{$\delta$}
+\label{d}
+\delta(i,j) \; = \; \text{\href{https://leanprover-community.github.io/mathlib4_docs/Init/Prelude.html\#if-then-else}{$\B \text{if } i=j \text{ then } 1 \text{ else } 0$}}.
+\end{equation}
+\end{definition}
+
+\bigskip
+
+\section{Main result}
+
+% \bigskip
+
+In this section, we characterize the values of $n$ for which the puzzle has a strategy and we present a sketch of the proof. The details of the proof are given in the next sections and are adapted for formalization in Lean. 
+
+% \bigskip
+
+\begin{theorem}
+The puzzle has a strategy for $n\in\mathbb{N}^*$ if and only if $n$ is a power of $2$.
+\end{theorem}
+
+{\it Sketch of the proof.}  
+
+$\boxed{\text{Modus Ponens}}$ Let $k\in \Fin n$. For every $b\in\Zz^n$, 
+$$\Fin n\ni i\mapsto f(b+{\rm e}_i)\in \Fin n \text{ is surjective},$$ and thus also injective. So,
+\begin{align*}
+2^n & = \sum_{b\in\Zz^n} 1  = \sum_{b\in\Zz^n} \sum_{i\in\Fin n} 
+\delta(f(b+{\rm e}_i),k) = \sum_{i\in\Fin n} \sum_{b\in\Zz^n} \delta(f(b+{\rm e}_i),k)\\
+& = \sum_{i\in\Fin n} \sum_{b\in\Zz^n} \delta(f(b),k)  = n \cdot \sum_{b\in\Zz^n} \delta(f(b),k).
+\end{align*}
+
+% \bigskip 
+
+$\boxed{\text{Modus Ponens Reverse}}$  Let $n=2^m$. Let $g : \Fin (2^m) \to \Zz^m$ be a bijection. Define
+$$f(b) := g^{-1}\left(\sum_{j\in\Fin 2^m} b_j \cdot g(j)\right), \quad b\in\Zz^n.$$ 
+
+Let $b\in\Zz^n$ and $k\in\Fin n$. 
+\begin{align*}
+& f(b+{\rm e}_i) = k 
+ \Leftrightarrow \sum_{j\in\Fin 2^m} b_j \cdot g(j) + 
+                  \sum_{j\in\Fin 2^m} {\rm e}_{ij} \cdot g(j) = g(k) \\
+& \Leftrightarrow \sum_{j\in\Fin 2^m} b_j \cdot g(j) + g(i) = g(k)  \Leftrightarrow i = g^{-1}\left(g(k) - \sum_{j\in\Fin 2^m} b_j \cdot g(j)\right).
+\end{align*}
+
+\section{Lean tactics}
+
+\begin{itemize}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.apply}{apply}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Batteries.Tactic.byContra}{by\_contra}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.constructor}{constructor}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.dsimp}{dsimp}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.exact}{exact}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.tacticHave__}{have}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.intro}{intro}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.tacticLet__}{let}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.obtain}{obtain}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.rwSeq}{rw}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.simp}{simp (only)}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Lean.Parser.Tactic.unfold}{unfold}
+    \item \href{https://leanprover-community.github.io/mathlib4_docs/tactics.html#Mathlib.Tactic.useSyntax}{use}
+\end{itemize}
+
+\newpage
+
+\section{Function shift is injective}
+
+\bigskip
+
+\begin{lemma}
+\label{fun_shift_surj} If $f:\Zz^n \to \Fin n$ is \eqref{SF} and $b\in\Zz^n$, 
+then\\ $\Fin n \ni i \mapsto f(b+{\rm e}_i) \in \Fin n$ is surjective.
+\end{lemma}
+
+\begin{proof}
+$\Fin n \ni i \mapsto f(b+{\rm e}_i) \in \Fin n$ is \href{https://leanprover-community.github.io/mathlib4_docs/Init/Data/Function.html#Function.Surjective}{surjective}, if
+$$\forall k \in \Fin n, \exists i \in \Fin n, f(b+{\rm e}_i) = k.$$
+Taking our $b$ in \eqref{SF}, we get the desired conclusion.
+\end{proof}
+
+\bigskip
+
+\begin{lemma}
+    \label{fun_shift_inj} If $f:\Zz^n \to \Fin n$ is \eqref{SF} and $b\in\Zz^n$, 
+    then \\ $\Fin n \ni i \mapsto f(b+{\rm e}_i) \in \Fin n$ is injective.
+\end{lemma}
+
+\begin{proof}
+Since $\Fin n \ni i \mapsto f(b+{\rm e}_i) \in \Fin n$ is a {\B surjective} function, by Lemma \ref{fun_shift_surj}, on a {\B finite} set, it is also {\B injective}.
+\end{proof}
+
+\verb|Mathlib hint:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Fintype/Card.html#Finite.injective_iff_surjective}{Finite.injective\_iff\_surjective}.
+
+\bigskip
+
+
+\section{Function shift sum}
+
+\bigskip
+
+\begin{lemma}
+\label{fun_shift_sum_one} If $f:\Zz^n \to \Fin n$ is \eqref{SF}, $b\in\Zz^n$, and $k\in\Fin n$, then
+$$\sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = 1.$$
+\end{lemma}
+
+\begin{proof}
+Since $f$ is \eqref{SF}, we {\B obtain} $i_k\in\Fin n$ such that $f(b+{\rm e}_{i_k}) = k$. 
+
+We shall prove that {\B only the $i_k$ term in the sum is equal to $1$, and the rest are $0$}.
+
+Clearly, if $i=i_k$ in the above sum, then $\delta(f(b+{\rm e}_i),k) = 1$, in view of \eqref{d}. 
+
+Fix $i\in\Fin n$ with $i\neq i_k$. Then, in view of \eqref{d}, $\delta(f(b+{\rm e}_i),k) = 0$, if $f(b+{\rm e}_i) \neq k = f(b+{\rm e}_{i_k})$. Assume that $f(b+{\rm e}_i) = f(b+{\rm e}_{i_k})$. Then, by Lemma \ref{fun_shift_inj}, $i=i_k$, which {\B contradicts} the assumption that $i\neq i_k$. 
+\end{proof}
+
+\verb|Mathlib hints:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Group/Finset/Basic.html#Finset.sum_eq_single_of_mem}{rw [Finset.sum\_eq\_single\_of\_mem $i_k$]}, \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Fintype/Defs.html#Finset.mem_univ}{Finset.mem\_univ}, \href{https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#if_pos}{if\_pos}, \href{https://leanprover-community.github.io/mathlib4_docs/Init/Core.html#if_neg}{if\_neg}.
+
+\bigskip
+
+\begin{lemma}
+\label{fun_shift_sum_pow2} If $f:\Zz^n \to \Fin n$ is \eqref{SF} and $k\in\Fin n$, then
+$$\sum_{b\in\Zz^n} \sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = 2^n.$$
+\end{lemma}
+
+\begin{proof}
+By Lemma \ref{fun_shift_sum_one}, for every $b\in\Zz^n$, $\sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = 1$. So,
+$$\sum_{b\in\Zz^n} \sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = \sum_{b\in\Zz^n} 1 = 2^n.$$
+\end{proof}
+
+\bigskip
+
+\begin{lemma}
+\label{fun_shift_sum_rev} If $f:\Zz^n \to \Fin n$ is \eqref{SF} and $k,i\in\Fin n$, then
+$$\sum_{b\in\Zz^n} \delta(f(b+{\rm e}_i),k) = \sum_{b\in\Zz^n} \delta(f(b),k).$$
+\end{lemma}
+
+\begin{proof}
+Since $\Zz^n \ni b \mapsto b + {\rm e}_i \in \Zz^n$ is a {\B bijection}, we the equality holds.
+\end{proof}
+
+\verb|Mathlib hints:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Group/Finset/Defs.html#Equiv.sum_comp}{Equiv.sum\_comp}, \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Group/Units/Equiv.html#Equiv.addRight}{Equiv.addRight}.
+
+\bigskip
+
+\section{Modus Ponens}
+
+\bigskip
+
+\begin{lemma} 
+\label{strategy_pow2} If $0<n$ and $f:\Zz^n \to \Fin n$ is \eqref{SF}, then $\exists N\in\mathbb{N}, n\cdot N = 2^n$.
+\end{lemma}
+
+\begin{proof} 
+{\B Let} $k := 0$ (which is in $\Fin n$ since $0<n$) in Lemma \ref{fun_shift_sum_pow2} to {\B have}
+$$\sum_{b\in\Zz^n} \sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = 2^n.$$ 
+
+Since the \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Group/Finset/Sigma.html#Finset.sum_comm}{sums commute} and Lemma \ref{fun_shift_sum_rev} holds,  
+$$\sum_{b\in\Zz^n} \sum_{i\in\Fin n} \delta(f(b+{\rm e}_i),k) = \sum_{i\in\Fin n} \sum_{b\in\Zz^n} \delta(f(b),k) = n \cdot \sum_{b\in\Zz^n} \delta(f(b),k).$$
+
+We {\B use} $N := \sum_{b\in\Zz^n} \delta(f(b),k)$.
+\end{proof}
+
+\bigskip
+
+\begin{lemma}
+\label{mul_pow2} If $\exists N\in\mathbb{N}, n\cdot N = 2^n$, then $\exists m\in\mathbb{N}, n = 2^m$.
+\end{lemma}
+
+\begin{proof}
+Since $n\cdot N = 2^n$, we {\B have} $n$ \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Divisibility/Basic.html#Dvd.intro}{divides} $2^n$. Since \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime/Defs.html#Nat.prime_two}{  $2$ is prime}, $\exists\,m\in\mathbb{N}, n = 2^m$.
+\end{proof}
+
+\verb|Mathlib hint:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Nat/Prime/Basic.html#Nat.dvd_prime_pow}{Nat.dvd\_prime\_pow}.
+
+\bigskip
+
+\begin{theorem}
+\label{puzzle_mp} If $0 < n$ and the puzzle has a strategy for $n$, then\\ $\exists m\in\mathbb{N}, n = 2^m$.
+\end{theorem}
+
+\begin{proof}
+Since the puzzle has a strategy, $\exists\,f$ with \eqref{SF}. By Lemma \ref{strategy_pow2}, $\exists\,N\in\mathbb{N}, n\cdot N = 2^n$. By Lemma \ref{mul_pow2}, $\exists\,m\in\mathbb{N}, n = 2^m$.
+\end{proof}
+
+\bigskip
+
+\section{Modus Ponens Reverse}
+
+\bigskip
+
+\begin{definition}
+\label{bij_Fin} For $m\in\mathbb{N}$, let $g : \Fin (2^m) \to \Zz^m$ be a bijective function. $g$ exists since $\Fin (2^m)$ and $\Zz^m$ are finite sets with the \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Data/Fintype/EquivFin.html#Fintype.equivOfCardEq}{same cardinality}.
+\end{definition}
+
+\bigskip
+
+\begin{lemma}
+\label{sum_basis} If $i \in \Fin n$ and $f : \Fin n \to \Zz^m$, then\\ $\displaystyle\sum_{j \in \Fin n} e_{ij} \boldsymbol{\cdot} f(j) = f(i)$.
+\end{lemma}
+
+\begin{proof}
+By \eqref{e}, $e_{ij} = 1$ if $i = j$ and $e_{ij} = 0$ otherwise.  $\sum_{j \in \Fin n} e_{ij} \boldsymbol{\cdot} f(j)$ simplifies to $f(i)$, since the single term that contributes is for $j = i$.
+\end{proof}
+
+\verb|Mathlib hint:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Module/BigOperators.html#Fintype.sum_single_smul}{rw[Fintype.sum\_single\_smul]}.
+
+\bigskip
+
+\begin{theorem}
+\label{puzzle_mpr} If $n = 2^m$ for some $m$, then the puzzle has a strategy for $n$.
+\end{theorem}
+
+\begin{proof}
+{\B Let} $g$ be from Definition \ref{bij_Fin} and {\B use} $f : \Zz^n \to \Fin n$ given by
+$$f(b) := g^{-1}\left(\sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j)\right), \quad b\in\Zz^n.$$
+
+Fix $b\in\Zz^n$ and $k\in\Fin n$. In view of \eqref{SF}, we want to show $\exists\,i\in\Fin n$, $f(b+{\rm e}_i) = k$.
+
+{\B Let}'s {\B use} $i := g^{-1}\left(g(k) - \sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j)\right)$. By \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Module/Defs.html#add_smul}{distributivity of the scalar multiplication over addition} and \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/BigOperators/Group/Finset/Basic.html#Finset.sum_add_distrib}{sum},
+$$\sum_{j\in\Fin 2^m} (b_j + e_{ij}) \boldsymbol{\cdot} g(j) = \sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j) + \sum_{j\in\Fin 2^m} e_{ij} \boldsymbol{\cdot} g(j).$$
+By Lemma \ref{sum_basis}, $\sum_{j\in\Fin 2^m} e_{ij} \boldsymbol{\cdot} g(j) = g(i)$. By the expression of $i$, 
+\begin{align*}
+& g^{-1}\left(\sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j) + g(i)\right) \\
+&= g^{-1}\left(\sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j) + g(k) - \sum_{j\in\Fin 2^m} b_j \boldsymbol{\cdot} g(j)\right) = g^{-1}(g(k)) = k.
+\end{align*}
+\end{proof}
+
+\verb|Mathlib hint:| \href{https://leanprover-community.github.io/mathlib4_docs/Mathlib/Logic/Equiv/Defs.html#Equiv.symm}{g.symm}.
+
+\bigskip
+
+\section{Finish}
+
+\begin{theorem}
+    \label{puzzle}
+If $0 < n$, then the puzzle has a strategy for $n$ if and only if  $\exists\,m \in \mathbb{N}, n = 2^m$.
+\end{theorem}
+
+\begin{proof}
+The forward direction is Theorem \ref{puzzle_mp}, and the reverse direction is Theorem \ref{puzzle_mpr}.
+\end{proof}
+
+
+\end{document}
