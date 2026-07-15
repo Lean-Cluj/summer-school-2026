@@ -10,29 +10,24 @@ LEAN is an interactive theorem prover and functional programming language used f
 
 
 ## Schedule
-| Monday, Sep 21                                               |
-|--------------------------------------------------------------|
-| 08:30 - Check In                                             |
-| 09:00 - Short introduction to functional programming in Lean |
-| 12:00 - Lunch break                                          |
-| 13:30 - Setting up the environment & examples                |
-| 18:00 - City tour                                            |
+### Monday, Sep 21
+- 08:30 - Check In
+- 09:00 - Short introduction to functional programming in Lean
+- 12:00 - Lunch break
+- 13:30 - Setting up the environment & examples
+- 18:00 - City tour
 
-| Tuesday, Sep 22                                              |
-|--------------------------------------------------------------|
-| 09:00 - Propositional logic in Lean                          |
-| 12:00 - Lunch break                                          |
-| 13:30 - Tactics                                              |
+### Tuesday, Sep 22
+- 09:00 - Propositional logic in Lean
+- 12:00 - Lunch break
+- 13:30 - Tactics
 
-| Wednesday, Sep 23                                            |
-|--------------------------------------------------------------|
-| 09:00 - Formalizing mathematical statements                  |
-| 12:00 - Lunch break                                          |
-| 13:30 - Setting up Lean Blueprint & collaborative project    |
+### Wednesday, Sep 23
+- 09:00 - Formalizing mathematical statements
+- 12:00 - Lunch break
+- 13:30 - Setting up Lean Blueprint & collaborative project
 
-| Thursday, Sep 24                                             |
-|--------------------------------------------------------------|
-| 09:00 - Algorithms and formal verification in Lean           |
-| 12:00 - Lunch break                                          |
-| 13:30 - Aeneas: Bridging Rust to Lean                        |
-
+### Thursday, Sep 24
+-  09:00 - Algorithms and formal verification in Lean
+- 12:00 - Lunch break
+- 13:30 - Aeneas: Bridging Rust to Lean
