@@ -1,0 +1,11 @@
+# Lean 4 / Lake build artifacts
+.lake/
+
+# Nix artifacts
+*.lock
+
+# Rust artifacts
+target/
+
+# Aeneas artifacts
+*.llbc

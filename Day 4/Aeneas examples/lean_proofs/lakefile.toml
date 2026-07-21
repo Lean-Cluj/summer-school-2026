@@ -1,0 +1,20 @@
+name = "MyProofs"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["MyProofs"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+
+[[require]]
+name = "aeneas"
+git = "https://github.com/AeneasVerif/aeneas.git"
+rev = "main"
+subDir = "backends/lean"
+
+[[lean_lib]]
+name = "MyProofs"
