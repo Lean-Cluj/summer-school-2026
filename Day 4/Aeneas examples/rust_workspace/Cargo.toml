@@ -1,0 +1,12 @@
+[workspace]
+resolver = "3"
+members = [
+    "add_ten",
+    "enums",
+    "mut_borrows",
+    "mersenne31",
+    "max_rec",
+    "max_iter",
+    "linux_kernel"
+    #"max_iter"
+]
