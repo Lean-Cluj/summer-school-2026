@@ -18,8 +18,7 @@ If you want to have control of the full workflows, you need to install Lean Blue
 
 * The guides below were tested on **Ubuntu**, but should work fine on other distros.
 * For **Windows** users, we suggest you install **WSL with Ubuntu** by following the steps here: [WSL setup](WSL_setup.md). Then, you can follow this guide for installing Lean Blueprint and Aeneas.
-
-  *This configuration requires an absolute minimum of 16 GB RAM.*
+*This configuration requires an absolute minimum of 16 GB RAM.*
 
 * For **macOS and other Linux distros**, follow the guides below and use the references to make any adjustments if needed.
 
@@ -42,7 +41,7 @@ Lean Blueprint is a plasTeX plugin that allows you to write blueprints for Lean 
 ---
 
 ### Aeneas
-Aeneas is a verification toolchain for Rust programs. It relies on a translation from Rust's MIR internal language to a pure lambda calculus. It is intended to be used in combination with Charon, which compiles Rust programs to an intermediate representation called LLBC
+Aeneas is a verification toolchain for Rust programs. It relies on a translation from Rust's MIR internal language to pure lambda calculus. It is intended to be used in combination with Charon, which compiles Rust programs to an intermediate representation called LLBC
 (see [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas)).
 
 **Guide:** [Aeneas Setup](Aeneas_via_Nix.md)

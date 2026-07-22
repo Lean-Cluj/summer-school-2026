@@ -7,7 +7,7 @@
 - [Install Elan](#install-elan)
 - [Create a new Lean project for math](#create-a-new-lean-project-for-math)
 - [Install the Lean 4 Extension for VS Code](#install-the-lean-4-extension-for-vs-code)
-- [Cleanup](#cleanup)
+- [Uninstall Elan](#uninstall-elan)
 
 ## Prerequisites
 ### Install Git
@@ -17,7 +17,7 @@ Lean requires Git to automatically download Mathlib and other project dependenci
     ```powershell
     winget install -e --id Git.Git --source winget --accept-package-agreements --accept-source-agreements
     ```
-3. **Restart** PowerShell: Windows did not load the new Git path variables into your active session. Close your current PowerShell window and open a new one.
+3. **Restart** PowerShell: The newly added Git path is not available in your current session. Close your current PowerShell window and open a new one.
 4. **Verify** the installation: In the new PowerShell window, run the following command:
     ```powershell
     git --version
@@ -25,24 +25,19 @@ Lean requires Git to automatically download Mathlib and other project dependenci
 ### Install VS Code
 VS Code is probably the most popular IDE for Lean.
 1. Open **PowerShell**: Press `Win + R`, type `powershell`, and hit Enter.
-2. **(Option 1) Run** the following command:
-    ```powershell
-    winget install -e --id Microsoft.VisualStudioCode --source winget --accept-package-agreements --accept-source-agreements
-    ```
-    By default, the winget installation will not add the "Open with Code" option to your Windows right-click menu.
-3. **(Option 2) Run** the following command, if you want the "Open with Code" feature:
+2. **Run** the following command:
     ```powershell
     winget install -e --id Microsoft.VisualStudioCode --override '/VERYSILENT /SP- /MERGETASKS="addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath"' --source winget --accept-package-agreements --accept-source-agreements
     ```
-4. **Restart** PowerShell: The installation automatically adds the `code` command to your system `PATH`, but your currently open shell will not recognize it yet. Close your current PowerShell window and open a new one.
-5. **Verify** the installation: Run the following command to open the current folder in VS Code.
+3. **Restart** PowerShell: The installation automatically adds the `code` command to your system `PATH`, but your currently open shell will not recognize it yet. Close your current PowerShell window and open a new one.
+4. **Verify** the installation: Run the following command to open the current folder in VS Code.
     ```powershell
     code .
     ```
     Recent versions of VS Code heavily promote Microsoft's AI tools on the initial welcome screen. It often prompts you to "Enable AI features" or sign up for GitHub Copilot. **You can completely ignore or dismiss this**; Lean 4 does not require AI tools to function. 
 
 ## Install Elan
-In the Lean ecosystem, `elan` is the official version manager for Lean toolchains.
+In the Lean ecosystem, `elan` is the official version manager that installs and switches between Lean toolchain versions.
 1. Open **PowerShell**: Press `Win + R`, type `powershell`, and hit Enter.
 2. **Run** the following commands:
     ```powershell
@@ -83,7 +78,7 @@ The official documentation for creating Lean projects is [https://leanprover-com
 
 
 ## Install the Lean 4 Extension for VS Code
-This extension is the most popular way of interacting with Lean. The official webpage for this extension is [https://marketplace.visualstudio.com/items?itemName=leanprover.lean4](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
+This extension is the most popular way of interacting with Lean. The official webpage for this extension is: [https://marketplace.visualstudio.com/items?itemName=leanprover.lean4](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
 1. Open **PowerShell**: Press `Win + R`, type `powershell`, and hit Enter.
 2. **Run** the following commands to open the project:
     ```powershell
@@ -96,9 +91,9 @@ This extension is the most popular way of interacting with Lean. The official we
 6. **Verify** the installation: Click on `FirstProject/Basic.lean` and the `Lean InfoView` should appear and show no errors. Press `Ctrl + Shift + Enter` to toggle the InfoView panel on or off.
 
 
-## Cleanup
+## Uninstall Elan
 1. To completely remove Elan and its associated Lean toolchains, you can use Elan's built-in uninstallation command.
-    ```bash
+    ```powershell
     elan self uninstall
     ```
     This should remove `~\.elan` (where the binaries and toolchains are stored). If the folder persists, remove it manually:

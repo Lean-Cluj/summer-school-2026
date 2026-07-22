@@ -3,26 +3,26 @@
 ## Table of Contents <!-- omit in toc -->
 - [Prerequisites](#prerequisites)
 - [Install Lean Blueprint](#install-lean-blueprint)
-  - [Using Lean Blueprint](#using-lean-blueprint)
-  - [Building the blueprint:](#building-the-blueprint)
+- [Using Lean Blueprint](#using-lean-blueprint)
+  - [Building the blueprint](#building-the-blueprint)
   - [Viewing the blueprint](#viewing-the-blueprint)
 - [Cleanup](#cleanup)
 
 
 ## Prerequisites
-The guide is for **Ubuntu** (eventually via WSL) and assumes the following:
+The guide is for **Ubuntu** (possibly via WSL) and assumes the following:
 1. [WSL setup](WSL_setup.md) (if you are on a Windows machine)
 2. [Basic setup for Linux](basic_setup_linux.md)
 3. [Nix setup](Nix_setup.md)
 
 ## Install Lean Blueprint
-Lean Blueprint is installed per project. As an example, we use `my_project` created in a previous step.
+Lean Blueprint is installed per project. As an example, we will use `my_project`, created in a previous step.
 
 1. **Navigate** to the root folder of the project
     ```bash
     cd ~/workspace/lean/my_project
     ```
-2. **Create** the Flake Configuration: Create a new file named exactly `flake.nix`
+2. **Create** the Flake Configuration: Make sure you are in the project root, then create a new file named exactly `flake.nix`:
     ```bash
     code flake.nix
     ``` 
@@ -52,7 +52,7 @@ Lean Blueprint is installed per project. As an example, we use `my_project` crea
                 packages = with pkgs; [
                   python3Packages.leanblueprint
                   graphviz
-                  texliveFull
+                  texliveFull  # ~4–5 GB download; see guide notes for smaller alternatives
                 ];
                 
                 shellHook = ''
@@ -85,11 +85,11 @@ Lean Blueprint is installed per project. As an example, we use `my_project` crea
     ```
     This is an interactive script. It will ask you a few setup questions (like your project name and author details). Hit **Enter** to choose the defaults and **Y** for everything else. It handles all the boilerplate by creating a `blueprint/` folder containing the necessary `.tex` files.
 
-### Using Lean Blueprint
+## Using Lean Blueprint
 Whenever you add new formalized theorems to your Lean code or update your LaTeX (`.tex`) files, you will need to regenerate the blueprint to see the changes.
 
-### Building the blueprint:
-1. In `lakefile.toml` move the `[[require]] name = "mathlib"` block at the end of the file.
+### Building the blueprint
+1. In `lakefile.toml`, move the `[[require]] name = "mathlib"` block to the end of the file. Lake processes dependencies in order; placing Mathlib last prevents it from overriding settings from other dependencies.
 2. The blueprint needs to verify your Lean declarations, so your code must compile successfully.
     ```bash
     lake update
@@ -101,7 +101,7 @@ Whenever you add new formalized theorems to your Lean code or update your LaTeX 
     ```bash
     leanblueprint web
     ```
-    Note that leanblueprint was compiled with `nix develop` so it is available within the nix shell. If you followed the [Nix Setup](Nix_setup.md) you will need to see "(nix)" in front of your prompt. If you don't, activate the Nix shell again with `nix develop`.
+    Note that `leanblueprint` is only available inside the Nix shell. If you followed the [Nix Setup](Nix_setup.md), you should see "(nix)" in front of your prompt. If you don't, activate the Nix shell again with `nix develop`.
 4. Build the PDF version of the blueprint:
     ```bash
     leanblueprint pdf
@@ -118,7 +118,7 @@ Whenever you add new formalized theorems to your Lean code or update your LaTeX 
 
 2. The **PDF version** is, by default, `blueprint/print/print.pdf`.
 
-    If you are running **WSL**, you can open the folder of the file `print.pdf` with the following commands:
+    If you are running **WSL**, you can open the folder containing `print.pdf` with the following commands:
     ```bash
     # exit nix shell
     exit
@@ -128,14 +128,14 @@ Whenever you add new formalized theorems to your Lean code or update your LaTeX 
     explorer.exe .
     ```
 
-## Cleanup
+## Uninstall Lean Blueprint
 Lean Blueprint is installed per project. So, the only system cleanup that you may want to do is to clean the Nix store:
   ```bash
   # move to project root folder if needed
   cd ~/workspace/lean/my_project
   # exit the Nix shell if it is active
   exit
-  # unlink the project from the dependencies
+  # remove the Nix flake configuration files
   rm flake.nix flake.lock
   # let nix remove all packages which are no longer used
   nix-collect-garbage
