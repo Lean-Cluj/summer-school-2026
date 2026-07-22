@@ -5,11 +5,11 @@
 - [Using Aeneas](#using-aeneas)
   - [Create a Test Rust Project](#create-a-test-rust-project)
   - [Translate from Rust to Lean](#translate-from-rust-to-lean)
-  - [Handle the generated Lean 4 code](#handle-the-generated-lean-4-code)
-- [Cleanup](#cleanup)
+  - [Integrate the Generated Lean 4 Code](#integrate-the-generated-lean-4-code)
+- [Uninstall Aeneas](#uninstall-aeneas)
 
 ## Install Aeneas
-The official installation instructions can be found here [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas). We let Nix do all the heavy lifting of grabbing Cargo, Rustc, and Charon.
+The official installation instructions can be found here: [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas). Nix handles downloading and configuring Cargo, rustc, and Charon.
 
 1. If you haven't done so already, follow: [Nix Installation](Nix_setup.md)
 2. **Clone** the repository into your home folder:
@@ -19,18 +19,18 @@ The official installation instructions can be found here [https://github.com/Aen
     cd aeneas
     ```
 
-3. **Setup Dependencies via Nix**: Initialize the Nix development environment. This single command will download and compile the exact versions of Rust, OCaml, and other required packages:
+3. **Set up Dependencies via Nix**: Initialize the Nix development environment. This single command will download and compile the exact versions of Rust, OCaml, and other required packages:
     ```bash
     nix develop
     ```
-    This first run will take quite a bit of time—potentially around 30 minutes—and bandwidth as it fetches the entire Rust and OCaml toolchains into the `/nix/store`.
+    This first run will take quite a bit of time—potentially around 30 minutes, depending on your internet connection and hardware—as it fetches the entire Rust and OCaml toolchains into `/nix/store`.
 
-4. **Verify**: Once `nix develop` finishes, your terminal prompt will change slightly. You are now inside a secure Nix shell where `rustc`, `cargo`, `charon`, and Aeneas are all fully available and perfectly configured, without ever installing them globally. If you followed [Nix Setup](Nix_setup.md) you will see "(nix)" in front of your prompt. You can also check:
+4. **Verify**: Once `nix develop` finishes, your terminal prompt will change slightly. You are now inside an isolated Nix shell where `rustc`, `cargo`, and Aeneas are all available and correctly configured, without placing them on your default `PATH`. If you followed [Nix Setup](Nix_setup.md), you will see "(nix)" in front of your prompt. You can also check:
     ```bash
     which rustc
     which cargo
     ```
-5. **Setup Charon**: Aeneas requires a specific version of the Charon repository. This command automatically clones the exact, compatible version into a local subfolder.
+5. **Set Up Charon**: Aeneas requires a specific version of the Charon repository. This command automatically clones the exact, compatible version into a local subfolder.
     ```bash
     make setup-charon
     ```
@@ -38,7 +38,7 @@ The official installation instructions can be found here [https://github.com/Aen
     ```bash
     make
     ```
-7. **Accessibility**: Run this command to append the tool paths to your shell configuration file and refresh the current shell:
+7. **Add to PATH**: Run this command to make `charon` and `aeneas` available outside the Nix shell. Note: if you later run `nix-collect-garbage`, these paths may break and you will need to rebuild.
     ```bash
     echo 'export PATH="$HOME/aeneas/bin:$HOME/aeneas/charon/bin:$PATH"' >> ~/.bashrc
     source ~/.bashrc
@@ -52,7 +52,7 @@ The official installation instructions can be found here [https://github.com/Aen
 ### Create a Test Rust Project
 
 
-1. **Rust**: While the Nix setup for Aeneas downloaded the required Rust tools, for daily use we tell the version manager to use the stable compiler by default:
+1. **Rust**: The Nix shell provided `rustc` and `cargo` for building Aeneas, but for your own Rust projects, you need a host-level Rust installation. Install it via [rustup](https://rustup.rs/) if you have not already, then set the default toolchain:
     ```bash
     rustup default stable
     ```
@@ -77,7 +77,7 @@ The official installation instructions can be found here [https://github.com/Aen
 
 ### Translate from Rust to Lean
 
-Aeneas cannot read raw Rust code directly. We first use `charon` to compile the Rust code into a simplified Intermediate Representation called LLBC.
+Aeneas cannot read raw Rust code directly. We first use `charon` to compile the Rust code into a simplified Intermediate Representation called LLBC (Low-Level Borrow Calculus).
 1. Make sure you are inside your project directory:
     ```bash
     cd ~/workspace/rust/simple_math
@@ -94,14 +94,14 @@ Aeneas cannot read raw Rust code directly. We first use `charon` to compile the 
     ```
     If everything is configured correctly, Aeneas will output `SimpleMath.lean`.
 
-### Handle the generated Lean 4 code
-To build on the Lean code in `SimpleMath.lean`, we need a Lean project.
+### Integrate the Generated Lean 4 Code
+To work with the generated `SimpleMath.lean`, we need to add it to a Lean project.
 1. Navigate to your Lean project and open VS Code:
     ```bash
     cd ~/workspace/lean/my_project/MyProject
     code .
     ```
-2. Open the configuration file `lakefile.toml` and add one of these blocks instead:
+2. Open the configuration file `lakefile.toml` and add one of the following dependency blocks:
 
     **Option A (Local Path):**
     ```toml
@@ -113,11 +113,11 @@ To build on the Lean code in `SimpleMath.lean`, we need a Lean project.
     ```toml
     [[require]]
     name = "aeneas"
-    git = "[https://github.com/AeneasVerif/aeneas.git](https://github.com/AeneasVerif/aeneas.git)"
+    git = "https://github.com/AeneasVerif/aeneas.git"
     subDir = "backends/lean"
     rev = "main" # (Or a specific commit hash)
     ```
-3. **Align Toolchain Version:** Make sure that the `lean-toolchain` file in your newly created project declares the exact Lean version that Aeneas is using so they can work together.
+3. **Align Toolchain Version:** Make sure that the `lean-toolchain` file in your newly created project declares the exact Lean version that Aeneas is using, so they can work together.
     Check the Aeneas version:
     ```bash
     cat ~/aeneas/backends/lean/lean-toolchain 
@@ -127,7 +127,7 @@ To build on the Lean code in `SimpleMath.lean`, we need a Lean project.
     * is at the **end of the file**, and
     * has the **same mathlib version as Aeneas**.
 
-4. **DO NOT Update** project dependencies with `lake update` this may change the version in your `lean-toolchain` file which Aeneas requires.
+4. **DO NOT run** `lake update`; it may pull a newer Mathlib that requires a different Lean toolchain, breaking compatibility with Aeneas.
 5. Download the precompiled mathlib binaries and build:
     ```bash
     lake exe cache get
@@ -137,14 +137,14 @@ To build on the Lean code in `SimpleMath.lean`, we need a Lean project.
     ```bash
     code MyProject/SimpleMath.lean
     ```
-    You will see your imperative Rust `double_number` function translated into a pure Lean Result monad. You can start proving things about the code.
+    You will see your imperative Rust `double_number` function translated into a Lean definition using the `Result` monad. You can now start writing proofs about this code.
 
-## Cleanup
+## Uninstall Aeneas
 1. Since we compiled Aeneas in this folder, all the files are inside this folder.
     ```bash
     rm -rf ~/aeneas
     ```
-2. Clean `.bashrc` by removing the line `export PATH="$HOME/aeneas/bin:$HOME/aeneas/charon/bin:$PATH"`
+2. Clean `~/.bashrc` by removing the line `export PATH="$HOME/aeneas/bin:$HOME/aeneas/charon/bin:$PATH"`:
     ```bash
     cd ~
     code .bashrc
