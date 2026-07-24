@@ -9,7 +9,7 @@
 - [Uninstall Aeneas](#uninstall-aeneas)
 
 ## Install Aeneas
-The official installation instructions can be found here: [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas). Nix handles downloading and configuring Cargo, rustc, and Charon.
+The official installation instructions can be found here: [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas). Nix handles downloading and configuring Cargo, rustc, and other tools.
 
 1. If you haven't done so already, follow: [Nix Installation](Nix_setup.md)
 2. **Clone** the repository into your home folder:
@@ -46,7 +46,7 @@ The official installation instructions can be found here: [https://github.com/Ae
 8. **Verify** the installation:
     ```bash
     charon --help
-    aeneas -version
+    aeneas --version
     ```
 ## Using Aeneas
 ### Create a Test Rust Project

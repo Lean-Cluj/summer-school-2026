@@ -23,7 +23,6 @@ The multi-user installation is the standard for Linux environments. Official ins
     Many modern Nix-based projects, including those in this guide, use Nix flakes. You need to explicitly enable this feature.
 5. **Shell Prompt Indicator**: By default, your bash prompt does not change when you enter a Nix development shell. To display a `(nix)` prefix so you can tell at a glance, add this setting:
     ```bash
-    cd ~
     echo 'bash-prompt-prefix = (nix)\040' >> ~/.config/nix/nix.conf
     ```
 
@@ -38,4 +37,17 @@ The multi-user installation is the standard for Linux environments. Official ins
 2. In addition, remove local user state and Nix configuration with:
     ```bash
     rm -rf ~/.config/nix ~/.nix-profile ~/.nix-defexpr ~/.nix-channels ~/.cache/nix ~/.local/state/nix 
+    ```
+
+3. During installation, Nix creates a backup of your system-wide Bash configuration file. (Note: This guide assumes you are using Ubuntu, where this file is `/etc/bash.bashrc`). If you only installed Nix for the summer school and want to completely remove it, you should restore this backup.
+
+    First, check that the only differences between the two files are the lines added by Nix:
+    ```bash
+    diff -u /etc/bash.bashrc /etc/bash.bashrc.backup-before-nix
+    ```
+    (You should only see lines containing "nix" being removed).
+
+    Once you confirm the changes are safe, restore the original configuration by overwriting the current file with the backup:
+    ```bash
+    sudo mv /etc/bash.bashrc.backup-before-nix /etc/bash.bashrc
     ```
