@@ -1,5 +1,5 @@
 [package]
-name = "max_iter"
+name = "affine_cipher"
 version = "0.1.0"
 edition = "2024"
 

@@ -5,7 +5,7 @@
    "type": "git",
    "subDir": "backends/lean",
    "scope": "",
-   "rev": "b059c34a7c347c32856af26772c9336e41c66a11",
+   "rev": "daa85d7e89400fa978be83fedbc7e475a83f0889",
    "name": "aeneas",
    "manifestFile": "lake-manifest.json",
    "inputRev": "main",
