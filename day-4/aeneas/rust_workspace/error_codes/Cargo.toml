@@ -1,5 +1,5 @@
 [package]
-name = "linux_kernel"
+name = "error_codes"
 version = "0.1.0"
 edition = "2024"
 
