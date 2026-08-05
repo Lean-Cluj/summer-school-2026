@@ -11,7 +11,7 @@
 ## Install Aeneas
 The official installation instructions can be found here: [https://github.com/AeneasVerif/aeneas](https://github.com/AeneasVerif/aeneas). Nix handles downloading and configuring Cargo, rustc, and other tools.
 
-1. If you haven't done so already, follow: [Nix Installation](Nix_setup.md)
+1. If you haven't done so already, follow: [Nix Installation](nix_setup.md)
 2. **Clone** the repository into your home folder:
     ```bash
     cd ~
