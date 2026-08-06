@@ -27,8 +27,8 @@ The multi-user installation is the standard for Linux environments. Official ins
     ```
 
 ## Continue the Guide With
-* [Lean Blueprint Installation](Lean_Blueprint_via_Nix.md)
-* [Aeneas Installation](Aeneas_via_Nix.md)
+* [Lean Blueprint Installation](lean_blueprint_via_nix.md)
+* [Aeneas Installation](aeneas_via_nix.md)
 
 
 ## Uninstall Nix
