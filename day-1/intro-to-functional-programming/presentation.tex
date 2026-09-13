@@ -1,0 +1,95 @@
+\documentclass{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{amssymb}
+
+\usepackage{color}
+
+\title{Introduction to LEAN}
+\author{Kovács György}
+\institute{Lean Summer School}
+\date{2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+
+\section{Lambda Calculus}
+
+\begin{frame}[fragile]
+\frametitle{Lambda Expressions Definition}
+
+$$ t := x  \mid  (\lambda x . t)  \mid   t\  t $$
+
+where
+\begin{description}
+  \item[$t$] a \textbf{term}, defined recursively by this grammar
+  \item[$\mathpzc{x}$] a \textbf{variable}, the simplest kind of term
+  \item[$(\lambda \mathpzc{x} . t)$] an \textbf{abstraction}: a function
+    that takes a variable $\mathpzc{x}$ and returns the term $t$
+  \item[$t\ t$] an \textbf{application}: one term applied to another
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lambda Expressions Examples}
+
+$$ t := x  \mid  (\lambda x . t)  \mid   t\  t $$
+
+\begin{description}
+  \item[$a$] just a variable
+  \item[$b$] just a variable
+  \item[$c$] just a variable
+  \item[$(\lambda a . a)$] abstraction
+  \item[$(\lambda a . b)$] abstraction
+  \item[$a\ b$] application
+  \item[$(\lambda x . x)\ b$] application, first term of application is abstraction
+  \item[$(\lambda f . f\ f)\ (\lambda x . x)$] application with first term being an abstraction that has an application in the body, and the second term of the application is another abstraction
+\end{description}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lambda Expressions Complex Examples}
+
+\begin{description}
+  \item[$ a\ b\ c $] is an application, where the first term is an application $(a\ b)$, and the second term is a variable $c$. A clearer way to write this would be  $(a\ b)\ c$. We will omit the parenthesis because they add too much noise
+  \item[$(\lambda a . \lambda b . a\ b) $] This is an abstraction with multiple inputs, this is just a simplified notation, the more rigorous version would be $(\lambda a . (\lambda b . f\ a\ b))$
+\end{description}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Lambda Calculus: Beta Reduction}
+
+$$ a \rightarrow a $$
+$$ a\ b \rightarrow a\ b$$
+$$ (\lambda e . e) \rightarrow (\lambda e . e) $$
+$$ (\lambda a . a)\ b \rightarrow b$$
+$$ (\lambda c . x)\ b \rightarrow x$$
+$$ (\lambda x . f\ x)\ b \rightarrow f\ b$$
+$$ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$$
+$$ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $$
+$$ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$$
+
+
+\end{frame}
+
+\section{Lean}
+
+\begin{frame}
+\frametitle{Intro to Lean}
+
+I hope I will get here eventually.
+\end{frame}
+
+
+\end{document}
