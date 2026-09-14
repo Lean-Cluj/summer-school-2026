@@ -3,7 +3,6 @@ import Mathlib.Algebra.Module.Pi
 import Mathlib.Data.Nat.Prime.Basic
 import Mathlib.Data.ZMod.Defs
 
-open Finset Function
 -------------------DEFINITIONS------------------------------------------
 abbrev Z2 (n : ℕ) := Fin n → ZMod 2
 notation "ℤ₂^" n : max => Z2 n
@@ -17,26 +16,26 @@ def HasStrategy (n : ℕ) : Prop := ∃ f : ℤ₂^n → Fin n, SF f
 
 def δ (i j : Fin n) : ℕ := if i = j then 1 else 0
 --------------------FUNCTION SHIFT IS INJECTIVE--------------------------
--- lemma fun_shift_surj : := sorry
+lemma fun_shift_surj : True := sorry
 
--- lemma fun_shift_inj : := sorry
+lemma fun_shift_inj : True := sorry
 ---------------------FUNCTION SHIFT SUM--------------------------------
--- lemma fun_shift_sum_one : := sorry
+lemma fun_shift_sum_one : True := sorry
 
--- lemma fun_shift_sum_pow2 : := sorry
+lemma fun_shift_sum_pow2 : True := sorry
 
--- lemma fun_shift_sum_rev : := sorry
+lemma fun_shift_sum_rev : True := sorry
 ---------------------------MODUS PONENS-------------------------------
--- lemma strategy_pow2 : := sorry
+lemma strategy_pow2 : True := sorry
 
--- lemma mul_pow2 : := sorry
+lemma mul_pow2 : True := sorry
 
--- theorem puzzle_mp : := sorry
+theorem puzzle_mp : True := sorry
 --------------------------MODUS PONENS REVERSE--------------------------
--- noncomputable def : := sorry
+noncomputable def bij_Fin : True := sorry
 
--- lemma sum_basis : := sorry
+lemma sum_basis : True := sorry
 
--- theorem puzzle_mpr : := sorry
+theorem puzzle_mpr : True := sorry
 ------------------------------FINISH----------------------------------
--- theorem puzzle : := sorry
+theorem puzzle : True := sorry
