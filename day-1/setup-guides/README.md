@@ -6,21 +6,25 @@
   - [Lean Blueprint](#lean-blueprint)
   - [Aeneas](#aeneas)
 
+These guides were tested on **Ubuntu** and **Windows**, and are provided as is, with no guarantee that they work on every machine or version. Each guide links to the official documentation, which takes precedence if something does not match your system.
+
 ## Basic Setup
-For a light installation which allows you to work with all the examples in the summer school, here are some tested guides:
+Installs Lean (via `elan`), VS Code with the Lean 4 extension, and a Lean project with Mathlib. This is enough for most of the examples in the summer school and is the required starting point.
 
 * [Basic setup for Ubuntu](basic_setup_linux.md)
 * [Basic setup for Windows](basic_setup_windows.md)
-* For **macOS and other Linux distros**, follow [Basic setup for Ubuntu](basic_setup_linux.md) and use the references to make any adjustments if needed.
+* On **macOS and other Linux distros**, follow the Ubuntu guide and adjust using the linked references where needed.
 
 ## Full Setup
-If you want to have control of the full workflows, you need to install Lean Blueprint and Aeneas. You can do this by following the official installation instructions or the guides below.
+Adds the Nix package manager, Lean Blueprint, and the Aeneas toolchain, so you can run the complete workflows (writing blueprints, verifying Rust code). It extends the basic setup rather than replacing it.
 
-* The guides below were tested on **Ubuntu**, but should work fine on other distros.
-* For **Windows** users, we suggest you install **WSL with Ubuntu** by following the steps here: [WSL setup](wsl_setup.md). Then, you can follow this guide for installing Lean Blueprint and Aeneas.
-*This configuration requires an absolute minimum of 16 GB RAM.*
+Complete the guides in this order:
 
-* For **macOS and other Linux distros**, follow the guides below and use the references to make any adjustments if needed.
+1. [Basic setup](#basic-setup) — on Windows, first install **WSL with Ubuntu** ([WSL setup](wsl_setup.md)), then follow the Ubuntu guide inside WSL.
+2. [Nix setup](nix_setup.md)
+3. [Lean Blueprint](lean_blueprint_via_nix.md) and/or [Aeneas](aeneas_via_nix.md) — independent of each other, install either or both.
+
+*Requires at least 16 GB of RAM.* The guides were tested on **Ubuntu** (native and under WSL); on **macOS and other Linux distros** they should work with minor adjustments, using the linked references.
 
 ---
 
