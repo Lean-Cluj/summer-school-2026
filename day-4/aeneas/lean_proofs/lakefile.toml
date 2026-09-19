@@ -1,7 +1,7 @@
-name = "MyProofs"
+name = "Proofs"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["MyProofs"]
+defaultTargets = ["Proofs"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -17,4 +17,5 @@ rev = "main"
 subDir = "backends/lean"
 
 [[lean_lib]]
-name = "MyProofs"
+name = "Proofs"
+globs = ["Proofs.+"]

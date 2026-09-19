@@ -3,9 +3,8 @@ resolver = "3"
 members = [
     "add_ten",
     "enums",
-    "mut_borrows",
+    "error_codes",
+    "max_array",
     "mersenne31",
-    "max_rec",
-    "max_iter",
-    "linux_kernel"
-]
+    "xor_cipher",
+    "affine_cipher"]
