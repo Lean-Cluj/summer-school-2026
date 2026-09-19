@@ -1,0 +1,12 @@
+name = "BooleProofs"
+version = "0.1.0"
+defaultTargets = ["BooleProofs"]
+
+[[require]]
+name = "cslib"
+git = "https://github.com/leanprover/cslib"
+rev = "Boole-sandbox"
+
+[[lean_lib]]
+name = "BooleProofs"
+globs = ["BooleProofs.XorCipher_boole"]

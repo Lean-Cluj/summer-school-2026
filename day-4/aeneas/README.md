@@ -65,3 +65,4 @@ steps are in [`rust_workspace/README.md`](rust_workspace/README.md).
 | [The Rust Programming Language](https://doc.rust-lang.org/book/) | The standard introduction to Rust. Chapter 3 describes the integer types and what happens on integer overflow, which the translation models as failure. |
 | [Functional Programming in Lean](https://lean-lang.org/functional_programming_in_lean/) | Monads and `do` notation, the form of the generated definitions. |
 | [The Lean Language Reference](https://lean-lang.org/doc/reference/latest/) | Definitions by `partial_fixpoint`, the mechanism behind `loop`. |
+

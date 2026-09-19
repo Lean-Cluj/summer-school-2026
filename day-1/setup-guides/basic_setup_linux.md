@@ -69,7 +69,7 @@ The official documentation for creating Lean projects is [https://leanprover-com
 ## Install the Lean 4 Extension for VS Code
 This extension is the most popular way of interacting with Lean. The official webpage for this extension is: [https://marketplace.visualstudio.com/items?itemName=leanprover.lean4](https://marketplace.visualstudio.com/items?itemName=leanprover.lean4)
 
-1. **IF** you reached this point from the **WSL** guide, return to connect VS Code to WSL: click [WSL Setup (Continue)](WSL_setup.md#connect-vs-code-to-wsl).
+1. **IF** you reached this point from the **WSL** guide, return to connect VS Code to WSL: click [WSL Setup (Continue)](wsl_setup.md#connect-vs-code-to-wsl).
 
 
 2. **ELSE**, open the newly created project:

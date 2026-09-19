@@ -6,7 +6,7 @@
 - [Using Lean Blueprint](#using-lean-blueprint)
   - [Building the blueprint](#building-the-blueprint)
   - [Viewing the blueprint](#viewing-the-blueprint)
-- [Cleanup](#cleanup)
+- [Uninstall Lean Blueprint](#uninstall-lean-blueprint)
 
 
 ## Prerequisites
@@ -101,7 +101,7 @@ Whenever you add new formalized theorems to your Lean code or update your LaTeX 
     ```bash
     leanblueprint web
     ```
-    Note that `leanblueprint` is only available inside the Nix shell. If you followed the [Nix Setup](Nix_setup.md), you should see "(nix)" in front of your prompt. If you don't, activate the Nix shell again with `nix develop`.
+    Note that `leanblueprint` is only available inside the Nix shell. If you followed the [Nix Setup](nix_setup.md), you should see "(nix)" in front of your prompt. If you don't, activate the Nix shell again with `nix develop`.
 4. Build the PDF version of the blueprint:
     ```bash
     leanblueprint pdf
