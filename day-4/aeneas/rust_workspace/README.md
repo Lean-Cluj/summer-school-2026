@@ -1,39 +1,66 @@
-# Rust library crates examples
+# Rust crates
 
-The selected examples are:
-- [add ten](add_ten/src/lib.rs)
-- [max in array](max_array/src/lib.rs)
-- [enums](enums/src/lib.rs)
-- [error codes](error_codes/src/lib.rs)
-- [Mersenne31 field arithmetic](mersenne31/src/lib.rs)
-- [affine cipher](affine_cipher/src/lib.rs)
-- [XOR cipher](xor_cipher/src/lib.rs)
+The workspace contains seven library crates. Each crate consists of a file
+`src/lib.rs` with one or two public Rust functions and their unit tests. Five
+crates have a Lean file with specifications and proofs, listed in the order of
+the session. The crates `enums` and `affine_cipher` have no Lean file.
 
-Make sure you have the Nix package manager installed as indicated in [Nix Setup](../../../day-1/setup-guides/nix_setup.md). The next steps guide you in running the provided examples.
+| Crate | Rust source | Lean file |
+| :--- | :--- | :--- |
+| `add_ten` | [add ten](add_ten/src/lib.rs) | [`AddTen_verified.lean`](../lean_proofs/Proofs/AddTen_verified.lean) |
+| `error_codes` | [error codes](error_codes/src/lib.rs) | [`ErrorCodes_verified.lean`](../lean_proofs/Proofs/ErrorCodes_verified.lean) |
+| `mersenne31` | [Mersenne31 field arithmetic](mersenne31/src/lib.rs) | [`Mersenne31_verified.lean`](../lean_proofs/Proofs/Mersenne31_verified.lean) |
+| `max_array` | [max in array](max_array/src/lib.rs) | [`MaxArray_verified.lean`](../lean_proofs/Proofs/MaxArray_verified.lean) |
+| `xor_cipher` | [XOR cipher](xor_cipher/src/lib.rs) | [`XorCipher_verified.lean`](../lean_proofs/Proofs/XorCipher_verified.lean) |
+| `enums` | [enums](enums/src/lib.rs) | — |
+| `affine_cipher` | [affine cipher](affine_cipher/src/lib.rs) | — |
 
-1. **Enter the Nix environment:** You need to run Charon from inside the Nix environment where it was built, which provides access to the correct libraries and the required nightly Rust toolchain.
+## Translating a crate to Lean
+
+The steps below use the installation of Charon and Aeneas for this course,
+which is built with the Nix package manager, installed as described in
+[Nix Setup](../../../day-1/setup-guides/nix_setup.md). Charon can also be built
+without Nix, with `rustup` and `make`, as described in its repository. The
+steps use the crate `add_ten` as the example.
+
+1. **Enter the Nix environment.** The Charon of this installation runs inside
+   the Nix environment in which it was built. The environment provides the
+   required libraries and the nightly Rust toolchain.
     ```bash
     nix develop ~/aeneas
     ```
 
-2. **Navigate to the Rust project folder** and run the tests:
+2. **Run the unit tests.** Go to the Rust workspace and run the tests of all
+   crates:
     ```bash
     cd "day-4/aeneas/rust_workspace/"
     cargo test --workspace --lib
     ```
 
-3. **Use Charon to convert `.rs` to `.llbc`:** Once inside the Nix shell, convert the code in `src/lib.rs` to LLBC (Low-Level Borrow Calculus). Because this is part of a workspace, the output file `add_ten.llbc` is created in the parent folder, `rust_workspace`.
+3. **Translate the Rust code to LLBC with Charon.** Inside the Nix
+   environment, Charon translates the code in `src/lib.rs` into LLBC
+   (Low-Level Borrow Calculus). Run the command below in the folder of the
+   crate, here `add_ten/`. Since the crate is part of a workspace, the output
+   file `add_ten.llbc` is created in the workspace folder `rust_workspace/`.
     ```bash
     charon cargo --preset=aeneas
     ```
-    Note: if your run this in a libary create subfoler you will generate the `.llbc` file for that library crate (in the root folder).
 
-4. **Use Aeneas to convert `.llbc` to `.lean`:** Move up one directory to where the `.llbc` file was created, and invoke Aeneas to translate it to Lean. Use the `-dest` flag to specify where the generated proofs should go. From `rust_workspace/` run
+4. **Translate LLBC to Lean with Aeneas.** In the folder `rust_workspace/`,
+   where the file `add_ten.llbc` was created, run Aeneas with the Lean backend.
+   The option `-dest` sets the folder for the generated Lean file.
     ```bash
     aeneas -backend lean add_ten.llbc -dest ../lean_proofs/Proofs/
     ```
+   The generated file `AddTen.lean` contains the definitions only. The file
+   `AddTen_verified.lean` contains the same definitions, followed by the
+   specifications and proofs.
 
-5. **Open in VS Code:** Navigate to the Lean workspace and open it. Opening the folder root (`code .`) is important because the Lean 4 extension requires the workspace root to initialize correctly and verify `AddTen.lean`.
+5. **Open the Lean project in VS Code.** Open the folder `lean_proofs/`
+   itself, with `code .`. The Lean 4 extension finds the Lake project of an
+   open file by searching upwards from the file for a `lean-toolchain` file;
+   opening the root of the project is the simplest way to make sure that it
+   uses the toolchain and the dependencies of this project.
     ```bash
     cd ../lean_proofs/
     code .
