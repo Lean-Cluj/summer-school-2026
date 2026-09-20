@@ -4,7 +4,7 @@ LEAN is an interactive theorem prover and functional programming language used f
 
 🗓️ 21-24 September 2026
 
-📍Clădirea Mathematica, Cluj-Napoca
+📍Sala e, Clădirea Mathematica, Cluj-Napoca
 
 🔗 https://math.ubbcluj.ro/~simion/lean/
 
@@ -14,20 +14,19 @@ LEAN is an interactive theorem prover and functional programming language used f
 - 08:30 - Check In
 - 09:00 - Short introduction to functional programming in Lean
 - 12:00 - Lunch break
-- 13:30 - Setting up the environment & examples
-- 18:00 - City tour
+- 13:30 - [Setup guides](day-1/setup-guides/README.md) & examples
 
 ### Tuesday, Sep 22
-- 09:00 - Propositional logic in Lean
+- 09:00 - [Logic](day-2/logic/README.md)
 - 12:00 - Lunch break
-- 13:30 - Tactics
+- 13:30 - [Tactics](day-2/tactics/README.md)
 
 ### Wednesday, Sep 23
-- 09:00 - Formalizing mathematical statements
+- 09:00 - [Formalizing mathematical statements](day-3/README.md)
 - 12:00 - Lunch break
-- 13:30 - Setting up Lean Blueprint & collaborative project
+- 13:30 - [Lean Blueprint & collaborative project](day-3/README.md)
 
 ### Thursday, Sep 24
--  09:00 - Algorithms and formal verification in Lean
+- 09:00 - [Algorithms](day-4/algorithms/README.md)
 - 12:00 - Lunch break
-- 13:30 - Aeneas: Bridging Rust to Lean
+- 13:30 - [Aeneas](day-4/aeneas/README.md)
