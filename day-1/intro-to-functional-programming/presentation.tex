@@ -1,10 +1,29 @@
 \documentclass{beamer}
 
-\usepackage[T1]{fontenc}
+\usepackage{mathtools}
 \usepackage{listings}
 \usepackage{amssymb}
-
 \usepackage{color}
+\usepackage[T1]{fontenc}
+
+% change math text to consolata
+\usepackage{inconsolata}
+\renewcommand{\familydefault}{\ttdefault}  % change all fonts to consolas (inconsolata)
+\usepackage{mathastext}
+\Mathastext
+
+% Note: My shorthand definitions
+\newcommand{\bool}{\text{Bool}}
+\newcommand{\nat}{\text{Nat}}
+
+\newcommand{\true}{\text{true}}
+\newcommand{\false}{\text{false}}
+\newcommand{\zero}{\text{0}}
+
+\newcommand{\suc}[1]{\text{succ}\ #1}
+\newcommand{\ha}[3]{\text{if}\ #1\ \text{then}\ #2\ \text{else}\ #3}
+\newcommand{\rec}[3]{\text{rec}\ #1\ #2\ #3}
+
 
 \title{Introduction to LEAN}
 \author{Kovács György}
@@ -15,75 +34,399 @@
 
 \frame{\titlepage}
 
+% TODO: I should add numbering here
 \begin{frame}
-\frametitle{Table of Contents}
-\tableofcontents
+  \frametitle{Table of Contents}
+  \tableofcontents
+\end{frame}
+
+\section{The Entscheidungsproblem}
+
+% TODO: introduce the entscheidungsproblem
+\begin{frame}
+  In mathematics and computer science, the Entscheidungsproblem (German for 'decision problem') is a challenge posed by David Hilbert and Wilhelm Ackermann in 1928.[1] It asks for an algorithm that considers an input statement and answers "yes" or "no" according to whether it is universally valid, i.e., valid in every structure. Such an algorithm was proven to be impossible by Alonzo Church and Alan Turing in 1936.
 \end{frame}
 
 \section{Lambda Calculus}
 
+\subsection{Untyped Lambda Calculus ($\lambda$)}
+
 \begin{frame}[fragile]
-\frametitle{Lambda Expressions Definition}
+  \frametitle{Lambda Expressions Definition}
 
-$$ t := x  \mid  (\lambda x . t)  \mid   t\  t $$
+  % Note: \coloneqq is a nice version of the walrus operator (:=)
+  % Note: \mid is a separator with spaces, like '|'
+  $$ t \coloneqq x  \mid  (\lambda x . t)  \mid   t\  t $$
 
-where
-\begin{description}
-  \item[$t$] a \textbf{term}, defined recursively by this grammar
-  \item[$\mathpzc{x}$] a \textbf{variable}, the simplest kind of term
-  \item[$(\lambda \mathpzc{x} . t)$] an \textbf{abstraction}: a function
-    that takes a variable $\mathpzc{x}$ and returns the term $t$
-  \item[$t\ t$] an \textbf{application}: one term applied to another
-\end{description}
-
+  where
+  \begin{description}
+    \item[$t$] a \textbf{term}, defined recursively by this grammar
+    \item[$x$] a \textbf{variable}, the simplest kind of term
+    \item[$(\lambda x . t)$] an \textbf{abstraction}: a function
+      that takes a variable $x$ and returns the term $t$
+    \item[$t\ t$] an \textbf{application}: one term applied to another
+  \end{description}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Lambda Expressions Examples}
+  \frametitle{Lambda Expressions Examples}
 
-$$ t := x  \mid  (\lambda x . t)  \mid   t\  t $$
+  $$ t \coloneqq x  \mid  (\lambda x . t)  \mid   t\  t $$
 
-\begin{description}
-  \item[$a$] just a variable
-  \item[$b$] just a variable
-  \item[$c$] just a variable
-  \item[$(\lambda a . a)$] abstraction
-  \item[$(\lambda a . b)$] abstraction
-  \item[$a\ b$] application
-  \item[$(\lambda x . x)\ b$] application, first term of application is abstraction
-  \item[$(\lambda f . f\ f)\ (\lambda x . x)$] application with first term being an abstraction that has an application in the body, and the second term of the application is another abstraction
-\end{description}
-
+  \begin{description}
+    \item[$a$] just a variable
+    \item[$b$] just a variable
+    \item[$c$] just a variable
+    \item[$(\lambda a . a)$] abstraction
+    \item[$(\lambda a . b)$] abstraction
+    \item[$a\ b$] application
+    \item[$(\lambda x . x)\ b$] application, first term of application is abstraction
+    \item[$(\lambda f . f\ f)\ (\lambda x . x)$] application with first term being an abstraction that has an application in the body, and the second term of the application is another abstraction
+  \end{description}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Lambda Expressions Complex Examples}
+  \frametitle{Lambda Expressions Complex Examples}
 
-\begin{description}
-  \item[$ a\ b\ c $] is an application, where the first term is an application $(a\ b)$, and the second term is a variable $c$. A clearer way to write this would be  $(a\ b)\ c$. We will omit the parenthesis because they add too much noise
-  \item[$(\lambda a . \lambda b . a\ b) $] This is an abstraction with multiple inputs, this is just a simplified notation, the more rigorous version would be $(\lambda a . (\lambda b . f\ a\ b))$
-\end{description}
-
-
+  \begin{description}
+    \item[$ a\ b\ c $] is an application, where the first term is an application $(a\ b)$, and the second term is a variable $c$. A clearer way to write this would be  $(a\ b)\ c$. We will omit the parenthesis because they add too much noise
+    \item[$(\lambda a . \lambda b . a\ b) $] This is an abstraction with multiple inputs, this is just a simplified notation, the more rigorous version would be $(\lambda a . (\lambda b . f\ a\ b))$
+  \end{description}
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Lambda Calculus: Beta Reduction}
+  \frametitle{Lambda Calculus: Beta Reduction}
+  $(\lambda a . a)\ b \rightarrow b$
+  $$ a \rightarrow a $$
+  $$ a\ b \rightarrow a\ b$$
+  $$ (\lambda e . e) \rightarrow (\lambda e . e) $$
+  $$ (\lambda a . a)\ b \rightarrow b$$
+  $$ (\lambda c . x)\ b \rightarrow x$$
+  $$ (\lambda x . f\ x)\ b \rightarrow f\ b$$
+  $$ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$$
+  $$ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $$
+  $$ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$$
+\end{frame}
 
-$$ a \rightarrow a $$
-$$ a\ b \rightarrow a\ b$$
-$$ (\lambda e . e) \rightarrow (\lambda e . e) $$
-$$ (\lambda a . a)\ b \rightarrow b$$
-$$ (\lambda c . x)\ b \rightarrow x$$
-$$ (\lambda x . f\ x)\ b \rightarrow f\ b$$
-$$ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$$
-$$ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $$
-$$ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$$
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Boolean}
 
+  $ \text{true} := (\lambda t . \lambda f . t) $ \\
+  $ \text{false} := (\lambda t . \lambda f . f) $ \\
+
+
+  $ \text{not} := (\lambda b . b\ \text{false}\ \text{true}) $ \\
+  $ \text{and} := (\lambda a . \lambda b . a\ b\ \text{false}) $ \\
+  $ \text{or} := (\lambda a . \lambda b . a\ \text{true}\ b) $ \\
+  $ \text{xor} := (\lambda a . \lambda b . a\ b\ (\text{not}\ b)) $ \\
+
+  $ \text{if} := (\lambda c . \lambda t . \lambda f . c\ t\ f) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Natural Numbers}
+  % This is the same definition as false!
+  $ 0 := (\lambda s . \lambda z . z) $ \\
+  $ 1 := (\lambda s . \lambda z . s\ z) $ \\
+  $ 2 := (\lambda s . \lambda z . s\ (s\ z)) $ \\
+  $ 3 := (\lambda s . \lambda z . s\ (s\ (s\ z))) $ \\
+
+  $ \text{succ} := (\lambda n . \lambda s . \lambda z . s\ (n\ s\ z)) $ \\
+
+  $ \text{add} := (\lambda m . \lambda n . \lambda s . \lambda z . m\ s\ (n\ s\ z)) $ \\
+  $ \text{mul} := (\lambda m . \lambda n . \lambda s . \lambda z . m\ (n\ s)\ z) $ \\
+
+  $ \text{isZero} := (\lambda n . n\ (\lambda x . \text{false})\ \text{true}) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Iteration}
+
+  $ \text{timesDoFor} := (\lambda n. \lambda f.\lambda v. n\ f\ v) $
+
+  $ \text{double} := (\lambda n. \text{mul}\ n\ 2) $
+
+  $ \text{timesDoFor}\ 3\ \text{double}\ 1 \rightarrow 8$
 
 \end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Recursion}
+
+  $ \text{Y} := (\lambda f. (\lambda x. f\ (x\ x)) (\lambda x. f\ (x\ x))) $ \\
+  $ \text{Y}\ f \rightarrow f\ (\text{Y}\ f) \rightarrow f\ (f\ (\text{Y}\ f)) \rightarrow \cdots$
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Nonsense}
+
+  $ \text{isZero}\ 0 \rightarrow \true $ \\
+  $ \text{isZero}\ 1 \rightarrow \false $ \\
+  $ \text{isZero}\ 2 \rightarrow \false $ \\
+  $ \text{isZero}\ 3 \rightarrow \false $ \\
+  $ \text{isZero}\ \false \rightarrow \true $ \\
+  $ \text{isZero}\ \true \rightarrow (\lambda z. \false) $ \\
+  $ \text{isZero}\ \text{isZero} \rightarrow \true $ \\
+  $ \text{isZero}\ (\lambda a . a) \rightarrow \false $ \\
+\end{frame}
+
+\subsection{Strictly Typed Lambda Calculus ($\lambda \rightarrow$)}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus}
+
+  $$ t \coloneqq x  \mid  (\lambda x : T . t)  \mid   t\  t \mid c $$
+
+  $$ T \coloneqq \tau \mid T \rightarrow T $$
+
+  \begin{description}
+    \item[$(\lambda x : T . t)$] an \textbf{abstraction} which accepts objects of type $T$ and returnes $t$
+    \item[$c$] is a \textbf{constant}. We can introduce constants with specific types
+    \item[$T$] is a \textbf{type}, every object needs to have a specific type!
+    \item[$\tau$] is a \textbf{type constant}, only types defined here will be in the langauge
+  \end{description}
+\end{frame}
+
+% TODO: add a frame here to explain why we can't define Bool!
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Booleans}
+
+  $$
+    t \coloneqq x
+      \mid (\lambda x : T . t)
+      \mid t\  t
+      \mid \true
+      \mid \false
+      \mid \ha{t}{t}{t}
+  $$
+
+  $$ T \coloneqq \bool \mid T \rightarrow T $$
+
+  In this language we have 3 constants:
+  \begin{enumerate}
+    \item true : Bool
+    \item false : Bool
+    \item if : Bool $\rightarrow$ Bool $\rightarrow$ Bool $\rightarrow$ Bool
+  \end{enumerate}
+
+  \pause
+
+  Our language can have the following types:
+  \begin{itemize}
+    \item[-] Bool
+    \item[-] Bool $\rightarrow$ Bool
+    \item[-] Bool $\rightarrow$ Bool $\rightarrow$ Bool
+    \item[-] (Bool $\rightarrow$ Bool) $\rightarrow$ Bool
+    \item[-] (Bool $\rightarrow$ Bool) $\rightarrow$ (Bool $\rightarrow$ Bool)
+    \item[-] and so on
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Booleans}
+
+  $ \ha{\true}{a}{b} \rightarrow a $ \\
+  $ \ha{\false}{a}{b} \rightarrow b $
+
+  \vspace{1cm}
+
+  \pause
+
+  $ \text{not} : \bool \rightarrow \bool $ \\
+  $ \text{not} \coloneqq (\lambda b : \bool . \ha{b}{\false}{\true}) $
+
+  \vspace{5mm}
+
+  $ \text{and} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{and} \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{b}{\false}) $ \\
+
+  \vspace{5mm}
+
+  $ \text{or} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{or}  \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{\true}{b}) $ \\
+
+  \vspace{5mm}
+
+  $ \text{xor} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{xor} \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{(\text{not}\ b)}{b}) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Natural Numbers}
+
+  $$
+    t \coloneqq \cdots
+      \mid \text{0}
+      \mid \suc{t}
+      \mid \text{rec}\ t\ t\ t
+  $$
+
+  $$ T \coloneqq \bool \mid \nat \mid T \rightarrow T $$
+
+
+  \begin{itemize}
+    \item[-] 0 : Nat
+    \item[-] suc : Nat $\rightarrow$ Nat
+    \item[-] rec : Nat $\rightarrow$ $\tau$ $\rightarrow$ (Nat $\rightarrow$ $\tau$ $\rightarrow$ $\tau$) $\rightarrow$ $\tau$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Natural Numbers}
+
+  $1 \coloneqq \suc{\zero}$ \\
+  $2 \coloneqq \suc{1}$ \\
+  $3 \coloneqq \suc{2}$ \\
+  \cdots
+
+  \vspace{1cm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . ???) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: rec}
+
+  $\text{rec} : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+
+  \vspace{5mm}
+
+  $\text{rec}\ 3\ z\ f  $ \\
+  $\rightarrow \rec{2}{(f\ 3\ z)}{f}$ \\
+  $\rightarrow \rec{1}{(f\ 2\ (f\ 3\ z))}{f}$ \\
+  $\rightarrow \rec{\zero}{(f\ 1\ (f\ 2\ (f\ 3\ z)))}{f}$ \\
+  $\rightarrow f\ 1\ (f\ 2\ (f\ 3\ z))$ \\
+
+  \vspace{5mm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda a: \nat . \suc{a})}) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Addition}
+
+  $f : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $f \coloneqq (\lambda k: \nat . \lambda r: \nat . \suc{r})$
+
+  \vspace{5mm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{f}) $
+
+  \vspace{5mm}
+
+  $\text{add}\ 2\ 3$ \\
+  $\rightarrow (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{f})\ 2\ 3$ \\
+  $\rightarrow \rec{2}{3}{f}$ \\
+  $\rightarrow \rec{1}{(f\ 2\ 3)}{f}$ \\
+  $\rightarrow \rec{\zero}{(f\ 1\ (f\ 2\ 3))}{f}$ \\
+  $\rightarrow f\ 1\ (f\ 2\ 3)$ \\
+  $\rightarrow \suc{(\suc{3})}$ \\
+  $\rightarrow \suc{4}$ \\
+  $\rightarrow 5$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Other Operations}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda r: \nat . \suc{r})}) $
+
+  \vspace{5mm}
+
+  $\text{mul} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  % TODO: this is wrapping, not sure how to make it shorter
+  $mul \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{\zero}{(\lambda k: \nat . \lambda r: \nat . \text{add}\ r\ b)}) $
+
+  \vspace{5mm}
+
+  $\text{isZero} : \nat \rightarrow \bool$ \\
+  $isZero \coloneqq (\lambda n : \nat . \rec{n}{\true}{(\lambda k: \nat . \lambda r: \bool . \false)}) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda r: \nat . \suc{r})}) $
+  $\rec : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{isZero} : \nat \rightarrow \bool$ \\
+  $isZero \coloneqq (\lambda n : \nat . \rec{n}{\true}{(\lambda k: \nat . \lambda r: \bool . \false)}) $ \\
+  $\rec : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  Every constant must have a single well defined type!
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+
+  $\rec : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+  $\rec : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  $\text{id} : \bool \rightarrow \bool$ \\
+  $\text{id} : \nat \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{if} : \bool \rightarrow \bool \rightarrow \bool \rightarrow \bool$ \\
+  $\text{if} : \bool \rightarrow \nat \rightarrow \nat \rightarrow \nat$
+  $\text{if} : \bool \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat)$
+
+  \vspace{5mm}
+
+  $\text{example} \coloneqq (\ha{(isZero\ n)}{succ}{pred})\ 5$
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+
+  $\text{rec}_{\nat} : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+  $\text{rec}_{\bool} : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  $\text{id}_{\bool} : \bool \rightarrow \bool$ \\
+  $\text{id}_{\nat} : \nat \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{if}_{\bool} : \bool \rightarrow \bool \rightarrow \bool \rightarrow \bool$ \\
+  $\text{if}_{\nat} : \bool \rightarrow \nat \rightarrow \nat \rightarrow \nat$ \\
+  $\text{if}_{\nat \rightarrow \nat} : \bool \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat)$
+
+  \vspace{5mm}
+
+  $\text{example} \coloneqq (\text{if}_{\nat \rightarrow \nat}\ (isZero\ n)\text{ then succ else pred})\ 5$
+\end{frame}
+
+\subsection{System F ($\lambda2$)}
+
+
+
+\subsection{Lambda Omega ($\lambda \omega$)}
+
+\subsection{Lambda P ($\lambda \Pi$)}
 
 \section{Lean}
+
+\subsection{Functions}
+
+\subsection{Types}
+\subsubsection{Structures}
+\subsubsection{Inductives}
+\subsection{Pattern Matching}
+\subsection{Proofs}
 
 \begin{frame}
 \frametitle{Intro to Lean}
