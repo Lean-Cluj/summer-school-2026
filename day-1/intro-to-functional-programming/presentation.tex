@@ -15,6 +15,7 @@
 % Note: My shorthand definitions
 \newcommand{\bool}{\text{Bool}}
 \newcommand{\nat}{\text{Nat}}
+\newcommand{\type}{\text{Type}}
 
 \newcommand{\true}{\text{true}}
 \newcommand{\false}{\text{false}}
@@ -279,7 +280,7 @@
   $1 \coloneqq \suc{\zero}$ \\
   $2 \coloneqq \suc{1}$ \\
   $3 \coloneqq \suc{2}$ \\
-  \cdots
+  $\cdots$
 
   \vspace{1cm}
 
@@ -389,7 +390,7 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+  \frametitle{Strictly Typed Lambda Calculus: Limitation}
 
   $\text{rec}_{\nat} : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
   $\text{rec}_{\bool} : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
@@ -412,11 +413,216 @@
 
 \subsection{System F ($\lambda2$)}
 
+\begin{frame}[fragile]
+  \frametitle{System F: Definitions}
 
+  $$
+    t \coloneqq \cdots
+      \mid \Lambda A . t
+      \mid t\ \{T\}
+  $$
+
+  $$ T \coloneqq \bool \mid T \rightarrow T \mid A \mid \forall A . T $$
+
+  $\text{id} : \forall A . A \rightarrow A$ \\
+  $\text{id} \coloneqq (\Lambda A . \lambda x : A . x)$
+
+  \vspace{5mm}
+
+  $\text{id}_{\nat} : \nat \rightarrow \nat$ \\
+  $\text{id}_{\nat} \coloneqq id\ \{\nat\}$
+
+  \vspace{5mm}
+
+  $\text{id}\ \{\bool\}\ \true \rightarrow \true$ \\
+  $\text{id}\ \{\nat\}\ 3 \rightarrow 3$ \\
+  $\text{id}\ \{\nat \rightarrow \bool\}\ \text{isZero} \rightarrow \text{isZero}$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: We only need 1 of each function now}
+
+   $\text{rec} : \forall T . \nat \rightarrow T \rightarrow (\nat \rightarrow T \rightarrow T) \rightarrow T$ \\
+
+  $\text{id} : \forall T . T \rightarrow T$ \\
+
+  $\text{if} : \forall T . \bool \rightarrow T \rightarrow T \rightarrow T$ \\
+
+  \vspace{5mm}
+
+  This is equivalent to generics in languages such as Java.
+
+  \begin{lstlisting}[language=Java]
+    class JavaExample {
+      <T> T id(T x) { return x; }
+      <T> T if(boolean b, T t, T f) {
+        return b ? t : f;
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Church Encodings are Back!}
+
+  $\bool \coloneqq \forall A . A \rightarrow A \rightarrow A$ \\
+  $\true \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . t)$ \\
+  $\false \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . f)$ \\
+
+  \vspace{5mm}
+
+  $\text{not} : \bool \rightarrow \bool$ \\
+  $\text{not} \coloneqq (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)$
+
+  \vspace{5mm}
+
+  $\text{not}\ \false$ \\
+  $\rightarrow (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)\ \false$ \\
+  $\rightarrow (\Lambda A . \lambda t : A . \lambda f : A . f)\ \{\bool\}\ \false\ \true$ \\
+  $\rightarrow (\lambda t : \bool . \lambda f : \bool . f)\ \false\ \true$ \\
+  $\rightarrow (\lambda f : \bool . f)\ \true$ \\
+  $\rightarrow \true$ \\
+
+  \vspace{5mm}
+
+  Since this is not how datatypes are implemented in LEAN, we will continue with the method from STLC and not mention this method again.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Complex Example}
+
+  $\text{compose} : \forall A . \forall B . \forall C . (A \rightarrow B) \rightarrow (B \rightarrow C) \rightarrow (A \rightarrow C)$ \\
+  $\text{compose} \coloneqq (\Lambda A . \Lambda B . \Lambda C . \ \lambda f_{ab} : A \rightarrow B . \lambda f_{bc} : B \rightarrow C . \lambda a: A . f_{bc}\ (f_{ab}\ a))$ \\
+
+  \vspace{5mm}
+
+  $\text{lessThan2} : \nat \rightarrow \bool$ \\
+  $\text{lessThan2} \coloneqq compose\ \{\nat\}\ \{\nat\}\ \{\bool\}\ \text{pred}\ \text{isZero}$
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Church Encodings are Back!}
+
+  $\bool \coloneqq \forall A . A \rightarrow A \rightarrow A$ \\
+  $\true \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . t)$ \\
+  $\false \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . f)$ \\
+
+  \vspace{5mm}
+
+  $\text{not} : \bool \rightarrow \bool$ \\
+  $\text{not} \coloneqq (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)$
+
+  \vspace{5mm}
+
+  $\text{not}\ \false$ \\
+  $\rightarrow (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)\ \false$ \\
+  $\rightarrow (\Lambda A . \lambda t : A . \lambda f : A . f)\ \{\bool\}\ \false\ \true$ \\
+  $\rightarrow (\lambda t : \bool . \lambda f : \bool . f)\ \false\ \true$ \\
+  $\rightarrow (\lambda f : \bool . f)\ \true$ \\
+  $\rightarrow \true$ \\
+
+  \vspace{5mm}
+
+  Since this is not how datatypes are implemented in LEAN, we will continue with the method from STLC and not mention this method again.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Limitation}
+
+  We might consider using types such as List, Option, Tuple and so on.
+  While we can define such constructs, we can't really use them as first class citizens.
+
+  \vspace{5mm}
+
+  $ Tuple\ A\ B \coloneqq \forall R. (A \rightarrow B \rightarrow R) \rightarrow R $ \\
+
+  \vspace{5mm}
+
+  We can defined List of Nat or List of Bool, but we can't talk generally about List or Tuple.
+
+\end{frame}
 
 \subsection{Lambda Omega ($\lambda \omega$)}
 
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Definitions}
+
+  $$ K \coloneqq \type \mid K \rightarrow K $$
+
+  $$ T \coloneqq \tau \mid T \rightarrow T \mid A \mid \forall A :: K . T \mid \lambda A :: K . T \mid T\ T $$
+
+  $$
+    t \coloneqq c
+      \mid x
+      \mid (\lambda x : T . t)
+      \mid t\ t
+      \mid (\Lambda A :: K . t)
+      \mid t\ \{T\}
+  $$
+
+  \vspace{5mm}
+
+  $\text{id} : \forall T :: Type . T \rightarrow T$ \\
+  $\text{id} \coloneqq (\Lambda A :: Type . \lambda x : A . x)$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Defining Option}
+
+  $Option :: Type \rightarrow Type$ \\
+  $Option \coloneqq \lambda A :: Type . \forall R :: Type . R \rightarrow (A \rightarrow R) \rightarrow R$ \\
+
+  \vspace{5mm}
+
+  $none : \forall A :: Type . Option\ A$ \\
+  $none : (\Lambda A :: Type . \Lambda R :: Type . \lambda n : R . \lambda s : A \rightarrow R . n)$
+
+  \vspace{5mm}
+
+  $some : \forall A :: Type . A \rightarrow Option\ A$
+  $some \coloneqq (\Lambda A :: Type . \lambda a:A . \Lambda R :: Type . \lambda n : R . \lambda s : A\rightarrow R . s\ a)$
+
+  \vspace{5mm}
+
+  $map : \forall A :: Type . \forall B :: Type . (A \rightarrow B) \rightarrow Option\ A \rightarrow Option\ B$
+  $map \coloneqq \cdots $
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Higher Kinded Types}
+
+  $map : \forall F :: Type \rightarrow Type . \ \forall A :: Type . \forall B :: Type . (A \rightarrow B) \rightarrow F\ A \rightarrow F\ B$
+
+  \vspace{1cm}
+
+  We have the power to express higher kinded types from Haskell!
+
+  \begin{lstlisting}[language=haskell]
+    map : (a -> b) -> f a -> f b
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Limitation}
+
+  While we can define a variety of types, we can't define a type that depends on a term.
+  The classic example is to have a Vector of exact length n.
+
+  \vspace{1cm}
+
+  $Vector :: \nat \rightarrow Type \rightarrow Type $ \\
+  $example: Vector\ 5\ \nat$
+
+\end{frame}
+
 \subsection{Lambda P ($\lambda \Pi$)}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Definition}
+\end{frame}
 
 \section{Lean}
 
