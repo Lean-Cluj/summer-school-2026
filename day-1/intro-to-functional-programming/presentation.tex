@@ -1,5 +1,6 @@
 \documentclass{beamer}
 
+\usepackage{graphicx}
 \usepackage{mathtools}
 \usepackage{listings}
 \usepackage{amssymb}
@@ -42,11 +43,13 @@
 \institute{Lean Summer School}
 \date{2026}
 
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+
 \begin{document}
 
 \frame{\titlepage}
 
-% TODO: I should add numbering here
 \begin{frame}
   \frametitle{Table of Contents}
   \tableofcontents
@@ -54,12 +57,44 @@
 
 \section{The Entscheidungsproblem}
 
-% TODO: introduce the entscheidungsproblem
 \begin{frame}
-  In mathematics and computer science, the Entscheidungsproblem (German for 'decision problem') is a challenge posed by David Hilbert and Wilhelm Ackermann in 1928.[1] It asks for an algorithm that considers an input statement and answers "yes" or "no" according to whether it is universally valid, i.e., valid in every structure. Such an algorithm was proven to be impossible by Alonzo Church and Alan Turing in 1936.
+  \frametitle{The Entscheidungsproblem}
+
+  \begin{columns}
+
+    \column{0.7\textwidth}
+    The Entscheidungsproblem (German for 'decision problem') is a challenge posed by David Hilbert and Wilhelm Ackermann in 1928.
+    It asks for an algorithm that considers an input statement and answers "yes" or "no" according to whether it is universally valid.
+
+    \column{0.3\textwidth}
+    \includegraphics[width=0.8\textwidth]{pics/Hilbert.jpg} \\
+    \includegraphics[width=0.8\textwidth]{pics/Ackermann.jpg}
+
+  \end{columns}
+
+\end{frame}
+
+\begin{frame}
+
+  \begin{columns}
+    \column{0.7\textwidth}
+    Such an algorithm was proven to be impossible by Alonzo Church and Alan Turing in 1936.
+
+    \column{0.3\textwidth}
+    \includegraphics[width=0.8\textwidth]{pics/Church.jpg} \\
+    \includegraphics[width=0.8\textwidth]{pics/Turing.jpg}
+  \end{columns}
+
 \end{frame}
 
 \section{Lambda Calculus}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge Lambda Calculus}
+  \vfill
+\end{frame}
 
 \subsection{Untyped Lambda Calculus ($\lambda$)}
 
@@ -108,16 +143,17 @@
 
 \begin{frame}[fragile]
   \frametitle{Lambda Calculus: Beta Reduction}
-  $(\lambda a . a)\ b \rightarrow b$
-  $$ a \rightarrow a $$
-  $$ a\ b \rightarrow a\ b$$
-  $$ (\lambda e . e) \rightarrow (\lambda e . e) $$
-  $$ (\lambda a . a)\ b \rightarrow b$$
-  $$ (\lambda c . x)\ b \rightarrow x$$
-  $$ (\lambda x . f\ x)\ b \rightarrow f\ b$$
-  $$ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$$
-  $$ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $$
-  $$ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$$
+  $ a \rightarrow a $ \\
+  $ a\ b \rightarrow a\ b$ \\
+  \pause
+  $ (\lambda e . e) \rightarrow (\lambda e . e) $ \\
+  $ (\lambda a . a)\ b \rightarrow b$ \\
+  \pause
+  $ (\lambda c . x)\ b \rightarrow x$ \\
+  $ (\lambda x . f\ x)\ b \rightarrow f\ b$ \\
+  $ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$ \\
+  $ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $ \\
+  $ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$
 \end{frame}
 
 \begin{frame}[fragile]
@@ -126,11 +162,18 @@
   $ \text{true} := (\lambda t . \lambda f . t) $ \\
   $ \text{false} := (\lambda t . \lambda f . f) $ \\
 
+  \vspace{1cm}
+  \pause
+
 
   $ \text{not} := (\lambda b . b\ \text{false}\ \text{true}) $ \\
+  \pause
   $ \text{and} := (\lambda a . \lambda b . a\ b\ \text{false}) $ \\
+  \pause
   $ \text{or} := (\lambda a . \lambda b . a\ \text{true}\ b) $ \\
+  \pause
   $ \text{xor} := (\lambda a . \lambda b . a\ b\ (\text{not}\ b)) $ \\
+  \pause
 
   $ \text{if} := (\lambda c . \lambda t . \lambda f . c\ t\ f) $ \\
 \end{frame}
@@ -142,6 +185,9 @@
   $ 1 := (\lambda s . \lambda z . s\ z) $ \\
   $ 2 := (\lambda s . \lambda z . s\ (s\ z)) $ \\
   $ 3 := (\lambda s . \lambda z . s\ (s\ (s\ z))) $ \\
+
+  \vspace{1cm}
+  \pause
 
   $ \text{succ} := (\lambda n . \lambda s . \lambda z . s\ (n\ s\ z)) $ \\
 
@@ -177,9 +223,13 @@
   $ \text{isZero}\ 1 \rightarrow \false $ \\
   $ \text{isZero}\ 2 \rightarrow \false $ \\
   $ \text{isZero}\ 3 \rightarrow \false $ \\
+  \pause
   $ \text{isZero}\ \false \rightarrow \true $ \\
+  \pause
   $ \text{isZero}\ \true \rightarrow (\lambda z. \false) $ \\
+  \pause
   $ \text{isZero}\ \text{isZero} \rightarrow \true $ \\
+  \pause
   $ \text{isZero}\ (\lambda a . a) \rightarrow \false $ \\
 \end{frame}
 
@@ -463,7 +513,7 @@
 
   This is equivalent to generics in languages such as Java.
 
-  \begin{lstlisting}[language=Java]
+  \begin{lstlisting}
     class JavaExample {
       <T> T id(T x) { return x; }
       <T> T if(boolean b, T t, T f) {
@@ -471,32 +521,6 @@
       }
     }
   \end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{System F: Church Encodings are Back!}
-
-  $\bool \coloneqq \forall A . A \rightarrow A \rightarrow A$ \\
-  $\true \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . t)$ \\
-  $\false \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . f)$ \\
-
-  \vspace{5mm}
-
-  $\text{not} : \bool \rightarrow \bool$ \\
-  $\text{not} \coloneqq (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)$
-
-  \vspace{5mm}
-
-  $\text{not}\ \false$ \\
-  $\rightarrow (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)\ \false$ \\
-  $\rightarrow (\Lambda A . \lambda t : A . \lambda f : A . f)\ \{\bool\}\ \false\ \true$ \\
-  $\rightarrow (\lambda t : \bool . \lambda f : \bool . f)\ \false\ \true$ \\
-  $\rightarrow (\lambda f : \bool . f)\ \true$ \\
-  $\rightarrow \true$ \\
-
-  \vspace{5mm}
-
-  Since this is not how datatypes are implemented in LEAN, we will continue with the method from STLC and not mention this method again.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -527,16 +551,24 @@
   \vspace{5mm}
 
   $\text{not}\ \false$ \\
+  \pause
   $\rightarrow (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)\ \false$ \\
+  \pause
   $\rightarrow (\Lambda A . \lambda t : A . \lambda f : A . f)\ \{\bool\}\ \false\ \true$ \\
+  \pause
   $\rightarrow (\lambda t : \bool . \lambda f : \bool . f)\ \false\ \true$ \\
+  \pause
   $\rightarrow (\lambda f : \bool . f)\ \true$ \\
+  \pause
   $\rightarrow \true$ \\
 
   \vspace{5mm}
 
   Since this is not how datatypes are implemented in LEAN, we will continue with the method from STLC and not mention this method again.
 \end{frame}
+
+
+
 
 \begin{frame}[fragile]
   \frametitle{System F: Limitation}
@@ -610,7 +642,7 @@
 
   We have the power to express higher kinded types from Haskell!
 
-  \begin{lstlisting}[language=haskell]
+  \begin{lstlisting}
     map : (a -> b) -> f a -> f b
   \end{lstlisting}
 
@@ -699,6 +731,13 @@
 
 \section{Lean}
 
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge LEAN}
+  \vfill
+\end{frame}
+
 \subsection{What is LEAN?}
 
 \begin{frame}
@@ -744,8 +783,6 @@
   Lean uses Algebraic Data Types (ADT), a way to build new types by combining existing types.
 \end{frame}
 
-\subsubsection{Structures}
-
 \begin{frame}[fragile]
   \frametitle{LEAN: Structures}
 
@@ -789,8 +826,6 @@
     #check tuple -- tuple : MyProduct Nat String
   \end{lstlisting}
 \end{frame}
-
-\subsubsection{Inductives}
 
 \begin{frame}[fragile]
   \frametitle{LEAN: Bool}
@@ -896,13 +931,87 @@
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{LEAN: More Functions}
+  \frametitle{LEAN: Lambda Functions}
 
   \begin{lstlisting}[language=lean]
-    -- use abbrev instead of def for better experience
-    def NaturalNumber : Type := Nat
+    def add1 : Nat → Nat := λ x => x + 1
+
+    #eval (λ x => x) 5 -- 5
+
+    #eval List.map (λ n => n * n) [1, 2, 3] -- [1, 4, 9]
+
+    #eval List.filter (λ e => e % 2 == 0) [1,2,3,4,5,6]
+    -- [2, 4, 6]
 
   \end{lstlisting}
+\end{frame}
+
+% AI: generated by Claude
+\subsection{Implicit Arguments}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Implicit Arguments}
+
+  \begin{lstlisting}[language=lean]
+    -- explicit: we must supply the type ourselves
+    def myId1 (T : Type) (x : T) : T := x
+    #eval myId1 Nat 5 -- 5
+
+    -- implicit: Lean infers it from the argument
+    def myId2 {T : Type} (x : T) : T := x
+    #eval myId2 5      -- 5, T := Nat inferred
+    #eval myId2 "hi"   -- "hi", T := String inferred
+
+    -- force it to be explicit anyway with @
+    #eval @myId2 Nat 5 -- 5
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Typeclasses}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Typeclasses}
+
+  \begin{lstlisting}[language=lean]
+    class Greet (α : Type) where
+      greet : α → String
+
+    instance : Greet Nat where
+      greet n := s!"Hello, number {n}!"
+
+    instance : Greet Bool where
+      greet b := if b then "Hello, true!" else "Hello, false!"
+
+    def greetIt {α : Type} [Greet α] (x : α) : String := Greet.greet x
+
+    #eval greetIt (5 : Nat)   -- "Hello, number 5!"
+    #eval greetIt true        -- "Hello, true!"
+  \end{lstlisting}
+
+\end{frame}
+
+\subsection{Recursion}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Recursion}
+
+  \begin{lstlisting}[language=lean]
+    def factorial (n : Nat) : Nat :=
+      if n == 0 then 1 else n * factorial (n - 1)
+
+    #eval factorial 5 -- 120
+
+    def length (xs : List α) : Nat :=
+      match xs with
+      | [] => 0
+      | _ :: rest => 1 + length rest
+
+    #eval length [1, 2, 3, 4] -- 4
+  \end{lstlisting}
+
+  \vspace{5mm}
+
+  Lean checks that recursive functions always terminate.
 \end{frame}
 
 \subsection{Pattern Matching}
@@ -911,19 +1020,89 @@
   \frametitle{LEAN: Pattern Matching}
 
   \begin{lstlisting}[language=lean]
+    def describe (n : Nat) : String :=
+      match n with
+      | 0 => "zero"
+      | 1 => "one"
+      | _ => "many"
+
+    #eval describe 7 -- "many"
+
+    def firstTwo (xs : List Nat) : String :=
+      match xs with
+      | [] => "empty"
+      | [x] => s!"one element: {x}"
+      | x :: y :: _ => s!"starts with {x}, {y}"
+
+    #eval firstTwo [1, 2, 3] -- "starts with 1, 2"
+
+    def safeDiv (a b : Nat) : Option Nat :=
+      match b with
+      | 0 => none
+      | _ => some (a / b)
+
+    #eval safeDiv 10 2 -- some 5
+    #eval safeDiv 10 0 -- none
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Dependent Types}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Dependent Types}
+
+  \begin{lstlisting}[language=lean]
     def boolOrNat : (b : Bool) → (λ x => if x then Bool else Nat) b
     | true  => false
     | false => (0 : Nat)
   \end{lstlisting}
+
+  \vspace{5mm}
+
+  The return \textbf{type} itself depends on the \textbf{value} of \texttt{b}. This is the $\Pi$-type from the Lambda Pi section, put to work: Lean's type system is built directly on it.
 \end{frame}
 
 \subsection{Proofs}
 
 \begin{frame}
-\frametitle{Intro to Lean}
+  \frametitle{LEAN: Propositions are Types}
 
-I hope I will get here eventually.
+  So far Lean has looked like an ordinary functional language: types, structures, functions, recursion.
+
+  \vspace{5mm}
+
+  But recall the Calculus of Constructions from earlier: a statement like $2 + 2 = 4$ is itself just a \textbf{type}, and a \textbf{proof} of it is just a \textbf{term} of that type.
+
+  \vspace{5mm}
+
+  This means Lean can check proofs exactly the way it checks any other program.
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{LEAN: A Proof of Equality}
+
+  \begin{lstlisting}[language=lean]
+    inductive Eq : α → β → Prop where
+      | refl : (a : α) → Eq a a
+
+    -- you can't have something like Eq 1 2 (1 = 2)
+    -- because it's impossible to construct
+
+    theorem trans (h_ab : Eq a b) (h_bc : Eq b c) : Eq a c :=
+      match h_ab with
+      | Eq.refl a => h_bc -- this is the branch where a = b
+  \end{lstlisting}
+
+  \vspace{5mm}
+
+  We will explore how (and how far) this goes in the next session.
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge Thank You!}
+  \vfill
+\end{frame}
 
 \end{document}
