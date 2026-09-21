@@ -12,6 +12,17 @@
 \usepackage{mathastext}
 \Mathastext
 
+% Note: Lean coloring
+\definecolor{keywordcolor}{rgb}{0.7, 0.1, 0.1}   % red
+\definecolor{tacticcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{commentcolor}{rgb}{0.4, 0.4, 0.4}   % grey
+\definecolor{symbolcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{sortcolor}{rgb}{0.1, 0.5, 0.1}      % green
+\definecolor{attributecolor}{rgb}{0.7, 0.1, 0.1} % red
+
+\def\lstlanguagefiles{lstlean.tex}
+\lstset{language=lean}
+
 % Note: My shorthand definitions
 \newcommand{\bool}{\text{Bool}}
 \newcommand{\nat}{\text{Nat}}
@@ -688,12 +699,224 @@
 
 \section{Lean}
 
-\subsection{Functions}
+\subsection{What is LEAN?}
+
+\begin{frame}
+  \frametitle{What is LEAN?}
+
+  Lean is an all purpose programming language designed by Leonardo de Moura and mantained by the Lean Focused Research Organization.
+
+  \vspace{5mm}
+
+  The first version of Lean was released in 2013, and the version that is used now (Lean 4) was released 10 years later.
+
+  \vspace{5mm}
+
+  Lean has been used to verify a number of theorems recently.
+
+\end{frame}
+
+\subsection{Compilation}
+
+\begin{frame}
+  \frametitle{LEAN: Compilation and Elaboration}
+
+  Lean is a compiled language. Here are the main steps:
+
+  \begin{enumerate}
+    \item \textbf{Parsing} Parses code into a syntax.
+    \item \textbf{Macro Expansion} Applies syntax changes.
+    \item \textbf{Elaboration} Transform syntax into code type theory.
+    \item \textbf{Kernel Checking} Verify if the result of elaboration follows the rules of type theory.
+    \item \textbf{Compilation} Compile to binary (C).
+  \end{enumerate}
+\end{frame}
 
 \subsection{Types}
+
+\begin{frame}
+  \frametitle{LEAN: Types}
+
+  Lean comes with a number of predefined types such as Nat, Int, String, List, Option and so on.
+
+  \vspace{1cm}
+
+  Lean uses Algebraic Data Types (ADT), a way to build new types by combining existing types.
+\end{frame}
+
 \subsubsection{Structures}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Structures}
+
+  \begin{lstlisting}[language=lean]
+    structure Person where
+      name : String
+      age : Nat
+
+    def leo := Person.mk "Leonardo" 42 -- default constructor
+    def name := Person.name leo
+    def age := Person.age leo
+
+    -- evaluate the result and print
+    #eval leo -- { name := "Leonardo", age := 42 }
+
+    -- typecheck
+    #check leo -- leo : Person
+
+    #eval name -- "Leonardo"
+    #check name -- name : String
+
+    #eval age -- 42
+    #check age -- age : Nat
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Structures with Generics}
+
+  \begin{lstlisting}[language=lean]
+    structure MyProduct (α β : Type) where
+      create :: -- custom constructor
+      fst : α
+      snd : β
+
+    def tuple := MyProduct.create (23 : Nat) "lol"
+    def number := MyProduct.fst tuple
+    def string := MyProduct.snd tuple
+
+    #eval tuple --  { fst := 23, snd := "lol" }
+    #check tuple -- tuple : MyProduct Nat String
+  \end{lstlisting}
+\end{frame}
+
 \subsubsection{Inductives}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Bool}
+
+  \begin{lstlisting}[language=lean]
+    inductive Boolean where
+      | true : Boolean
+      | false : Boolean
+
+    def isMyComputerOn := Boolean.true
+
+    #eval isMyComputerOn -- Boolean.true
+    #check isMyComputerOn -- isMyComputerOn : Boolean
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Unit}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyUnit where
+      | unit : MyUnit
+
+    def myUnit := MyUnit.unit
+
+    #eval myUnit -- Unit.unit
+    #check myUnit -- myUnit : MyUnit
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Void}
+
+  \begin{lstlisting}[language=lean]
+    inductive Void where
+
+    -- you can't have a value of type void because
+    -- there are no constructors
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Option}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyOption α where
+      | some : α → MyOption α
+      | none : MyOption α
+
+    def something := some "Hello"
+    #check something -- Option String
+
+    def nothing : Option Nat := none
+    #check nothing -- Option Nat
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: List}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyList α where
+      | cons : α → MyList α → MyList α
+      | nil : MyList α
+
+    def emptyList : MyList String := MyList.nil
+
+    def oneElement := MyList.cons 1 MyList.nil
+
+    def twoElements := MyList.cons 2 (MyList.cons 1 MyList.nil)
+
+    -- Lean lists have sugaring for lists, so they look like this:
+
+    def realEmpty : List String := []
+
+    def realElements := [1, 2, 3, 4]
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Functions}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Functions}
+
+  \begin{lstlisting}[language=lean]
+    def myId (x : α) : α := x
+    #eval myId 123 -- 123
+
+    def add1 (x : Nat) : Nat := x + 1
+    #eval add1 2 -- 3
+
+    def add (a : Nat) (b : Nat) : Nat := a + b
+    #eval add 5 2 -- 7
+
+    def myNot (b : Bool) : Bool := if b then false else true
+    #eval myNot true -- false
+
+    def myFunc (n : Nat) (f : Nat -> Nat) (g : Nat -> Nat) : (Nat -> Nat) :=
+      if n == 0 then f else g
+
+    #eval (myFunc 3 Nat.succ Nat.pred) 4 -- 3
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: More Functions}
+
+  \begin{lstlisting}[language=lean]
+    -- use abbrev instead of def for better experience
+    def NaturalNumber : Type := Nat
+
+  \end{lstlisting}
+\end{frame}
+
 \subsection{Pattern Matching}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Pattern Matching}
+
+  \begin{lstlisting}[language=lean]
+    def boolOrNat : (b : Bool) → (λ x => if x then Bool else Nat) b
+    | true  => false
+    | false => (0 : Nat)
+  \end{lstlisting}
+\end{frame}
+
 \subsection{Proofs}
 
 \begin{frame}
