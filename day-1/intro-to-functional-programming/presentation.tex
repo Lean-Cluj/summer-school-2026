@@ -622,6 +622,68 @@
 
 \begin{frame}
   \frametitle{Lambda Pi: Definition}
+
+  $$
+    T \coloneqq \tau
+      \mid T \rightarrow T
+      \mid A
+      \mid \forall A . T
+      \mid \lambda A . T
+      \mid T\ T
+      \mid \Pi x : T . T
+      \mid Type
+  $$
+
+  $$
+    t \coloneqq c
+      \mid x
+      \mid (\lambda x : T . t)
+      \mid t\ t
+      \mid (\Lambda A : T . t)
+      \mid t\ \{T\}
+  $$
+
+  \vspace{5mm}
+
+  Kinds are merged into types, and a function is added that takes a term and produces a type.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Example}
+  $boolOrNat : \Pi x : Bool . \ha{b}{Bool}{Nat}$ \\
+  $boolOrNat \coloneqq (\lambda b : Bool . \ha{b}{false}{0})$
+
+  \vspace{1cm}
+
+  $(\Pi x : Bool . \ha{b}{Bool}{Nat})\ false$ \\
+  $\rightarrow \ha{false}{Bool}{Nat}$\\
+  $\rightarrow Nat$
+
+  \vspace{5mm}
+
+  $boolOrNat\ false$\\
+  $\rightarrow (\lambda b : Bool . \ha{b}{false}{0})\ false$\\
+  $\rightarrow \ha{false}{false}{0}$\\
+  $\rightarrow 0$\\
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Calculus of Constructions}
+
+  We have reached the Calculus of Constructions. We are fully able to prove theorems with what we have. Now there are only a few steps until we reach LEAN.
+
+  \vspace{5mm}
+
+  $$(\lambda n : Nat . n + 0 = n)$$
+
+  \vspace{5mm}
+
+  We just need to add a couple of features, such as universes and a way to create types. We will not get too into those, since it is time to actually get introduced to LEAN.
+
+  $$42 : Nat : Type : Type 1 : Type 2 : \cdots$$
+
 \end{frame}
 
 \section{Lean}
