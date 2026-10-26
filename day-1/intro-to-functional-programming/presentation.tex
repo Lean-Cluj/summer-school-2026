@@ -1,0 +1,1108 @@
+\documentclass{beamer}
+
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage[T1]{fontenc}
+
+% change math text to consolata
+\usepackage{inconsolata}
+\renewcommand{\familydefault}{\ttdefault}  % change all fonts to consolas (inconsolata)
+\usepackage{mathastext}
+\Mathastext
+
+% Note: Lean coloring
+\definecolor{keywordcolor}{rgb}{0.7, 0.1, 0.1}   % red
+\definecolor{tacticcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{commentcolor}{rgb}{0.4, 0.4, 0.4}   % grey
+\definecolor{symbolcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{sortcolor}{rgb}{0.1, 0.5, 0.1}      % green
+\definecolor{attributecolor}{rgb}{0.7, 0.1, 0.1} % red
+
+\def\lstlanguagefiles{lstlean.tex}
+\lstset{language=lean}
+
+% Note: My shorthand definitions
+\newcommand{\bool}{\text{Bool}}
+\newcommand{\nat}{\text{Nat}}
+\newcommand{\type}{\text{Type}}
+
+\newcommand{\true}{\text{true}}
+\newcommand{\false}{\text{false}}
+\newcommand{\zero}{\text{0}}
+
+\newcommand{\suc}[1]{\text{succ}\ #1}
+\newcommand{\ha}[3]{\text{if}\ #1\ \text{then}\ #2\ \text{else}\ #3}
+\newcommand{\rec}[3]{\text{rec}\ #1\ #2\ #3}
+
+
+\title{Introduction to LEAN}
+\author{Kovács György}
+\institute{Lean Summer School}
+\date{2026}
+
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+  \frametitle{Table of Contents}
+  \tableofcontents
+\end{frame}
+
+\section{The Entscheidungsproblem}
+
+\begin{frame}
+  \frametitle{The Entscheidungsproblem}
+
+  \begin{columns}
+
+    \column{0.7\textwidth}
+    The Entscheidungsproblem (German for 'decision problem') is a challenge posed by David Hilbert and Wilhelm Ackermann in 1928.
+    It asks for an algorithm that considers an input statement and answers "yes" or "no" according to whether it is universally valid.
+
+    \column{0.3\textwidth}
+    \includegraphics[width=0.8\textwidth]{pics/Hilbert.jpg} \\
+    \includegraphics[width=0.8\textwidth]{pics/Ackermann.jpg}
+
+  \end{columns}
+
+\end{frame}
+
+\begin{frame}
+
+  \begin{columns}
+    \column{0.7\textwidth}
+    Such an algorithm was proven to be impossible by Alonzo Church and Alan Turing in 1936.
+
+    \column{0.3\textwidth}
+    \includegraphics[width=0.8\textwidth]{pics/Church.jpg} \\
+    \includegraphics[width=0.8\textwidth]{pics/Turing.jpg}
+  \end{columns}
+
+\end{frame}
+
+\section{Lambda Calculus}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge Lambda Calculus}
+  \vfill
+\end{frame}
+
+\subsection{Untyped Lambda Calculus ($\lambda$)}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Expressions Definition}
+
+  % Note: \coloneqq is a nice version of the walrus operator (:=)
+  % Note: \mid is a separator with spaces, like '|'
+  $$ t \coloneqq x  \mid  (\lambda x . t)  \mid   t\  t $$
+
+  where
+  \begin{description}
+    \item[$t$] a \textbf{term}, defined recursively by this grammar
+    \item[$x$] a \textbf{variable}, the simplest kind of term
+    \item[$(\lambda x . t)$] an \textbf{abstraction}: a function
+      that takes a variable $x$ and returns the term $t$
+    \item[$t\ t$] an \textbf{application}: one term applied to another
+  \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Expressions Examples}
+
+  $$ t \coloneqq x  \mid  (\lambda x . t)  \mid   t\  t $$
+
+  \begin{description}
+    \item[$a$] just a variable
+    \item[$b$] just a variable
+    \item[$c$] just a variable
+    \item[$(\lambda a . a)$] abstraction
+    \item[$(\lambda a . b)$] abstraction
+    \item[$a\ b$] application
+    \item[$(\lambda x . x)\ b$] application, first term of application is abstraction
+    \item[$(\lambda f . f\ f)\ (\lambda x . x)$] application with first term being an abstraction that has an application in the body, and the second term of the application is another abstraction
+  \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Expressions Complex Examples}
+
+  \begin{description}
+    \item[$ a\ b\ c $] is an application, where the first term is an application $(a\ b)$, and the second term is a variable $c$. A clearer way to write this would be  $(a\ b)\ c$. We will omit the parenthesis because they add too much noise
+    \item[$(\lambda a . \lambda b . a\ b) $] This is an abstraction with multiple inputs, this is just a simplified notation, the more rigorous version would be $(\lambda a . (\lambda b . f\ a\ b))$
+  \end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Beta Reduction}
+  $ a \rightarrow a $ \\
+  $ a\ b \rightarrow a\ b$ \\
+  \pause
+  $ (\lambda e . e) \rightarrow (\lambda e . e) $ \\
+  $ (\lambda a . a)\ b \rightarrow b$ \\
+  \pause
+  $ (\lambda c . x)\ b \rightarrow x$ \\
+  $ (\lambda x . f\ x)\ b \rightarrow f\ b$ \\
+  $ (\lambda a . \lambda b . f\ a\ b)\ x\ y \rightarrow (\lambda b . f\ x\ b)\ y \rightarrow f\ x\ y$ \\
+  $ (\lambda x . x)\ (\lambda x . x) \rightarrow (\lambda x . x) $ \\
+  $ (\lambda y . y\ y\ y)\ a \rightarrow a\ a\ a$
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Boolean}
+
+  $ \text{true} := (\lambda t . \lambda f . t) $ \\
+  $ \text{false} := (\lambda t . \lambda f . f) $ \\
+
+  \vspace{1cm}
+  \pause
+
+
+  $ \text{not} := (\lambda b . b\ \text{false}\ \text{true}) $ \\
+  \pause
+  $ \text{and} := (\lambda a . \lambda b . a\ b\ \text{false}) $ \\
+  \pause
+  $ \text{or} := (\lambda a . \lambda b . a\ \text{true}\ b) $ \\
+  \pause
+  $ \text{xor} := (\lambda a . \lambda b . a\ b\ (\text{not}\ b)) $ \\
+  \pause
+
+  $ \text{if} := (\lambda c . \lambda t . \lambda f . c\ t\ f) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Natural Numbers}
+  % This is the same definition as false!
+  $ 0 := (\lambda s . \lambda z . z) $ \\
+  $ 1 := (\lambda s . \lambda z . s\ z) $ \\
+  $ 2 := (\lambda s . \lambda z . s\ (s\ z)) $ \\
+  $ 3 := (\lambda s . \lambda z . s\ (s\ (s\ z))) $ \\
+
+  \vspace{1cm}
+  \pause
+
+  $ \text{succ} := (\lambda n . \lambda s . \lambda z . s\ (n\ s\ z)) $ \\
+
+  $ \text{add} := (\lambda m . \lambda n . \lambda s . \lambda z . m\ s\ (n\ s\ z)) $ \\
+  $ \text{mul} := (\lambda m . \lambda n . \lambda s . \lambda z . m\ (n\ s)\ z) $ \\
+
+  $ \text{isZero} := (\lambda n . n\ (\lambda x . \text{false})\ \text{true}) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Iteration}
+
+  $ \text{timesDoFor} := (\lambda n. \lambda f.\lambda v. n\ f\ v) $
+
+  $ \text{double} := (\lambda n. \text{mul}\ n\ 2) $
+
+  $ \text{timesDoFor}\ 3\ \text{double}\ 1 \rightarrow 8$
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Recursion}
+
+  $ \text{Y} := (\lambda f. (\lambda x. f\ (x\ x)) (\lambda x. f\ (x\ x))) $ \\
+  $ \text{Y}\ f \rightarrow f\ (\text{Y}\ f) \rightarrow f\ (f\ (\text{Y}\ f)) \rightarrow \cdots$
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Calculus: Nonsense}
+
+  $ \text{isZero}\ 0 \rightarrow \true $ \\
+  $ \text{isZero}\ 1 \rightarrow \false $ \\
+  $ \text{isZero}\ 2 \rightarrow \false $ \\
+  $ \text{isZero}\ 3 \rightarrow \false $ \\
+  \pause
+  $ \text{isZero}\ \false \rightarrow \true $ \\
+  \pause
+  $ \text{isZero}\ \true \rightarrow (\lambda z. \false) $ \\
+  \pause
+  $ \text{isZero}\ \text{isZero} \rightarrow \true $ \\
+  \pause
+  $ \text{isZero}\ (\lambda a . a) \rightarrow \false $ \\
+\end{frame}
+
+\subsection{Strictly Typed Lambda Calculus ($\lambda \rightarrow$)}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus}
+
+  $$ t \coloneqq x  \mid  (\lambda x : T . t)  \mid   t\  t \mid c $$
+
+  $$ T \coloneqq \tau \mid T \rightarrow T $$
+
+  \begin{description}
+    \item[$(\lambda x : T . t)$] an \textbf{abstraction} which accepts objects of type $T$ and returnes $t$
+    \item[$c$] is a \textbf{constant}. We can introduce constants with specific types
+    \item[$T$] is a \textbf{type}, every object needs to have a specific type!
+    \item[$\tau$] is a \textbf{type constant}, only types defined here will be in the langauge
+  \end{description}
+\end{frame}
+
+% TODO: add a frame here to explain why we can't define Bool!
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Booleans}
+
+  $$
+    t \coloneqq x
+      \mid (\lambda x : T . t)
+      \mid t\  t
+      \mid \true
+      \mid \false
+      \mid \ha{t}{t}{t}
+  $$
+
+  $$ T \coloneqq \bool \mid T \rightarrow T $$
+
+  In this language we have 3 constants:
+  \begin{enumerate}
+    \item true : Bool
+    \item false : Bool
+    \item if : Bool $\rightarrow$ Bool $\rightarrow$ Bool $\rightarrow$ Bool
+  \end{enumerate}
+
+  \pause
+
+  Our language can have the following types:
+  \begin{itemize}
+    \item[-] Bool
+    \item[-] Bool $\rightarrow$ Bool
+    \item[-] Bool $\rightarrow$ Bool $\rightarrow$ Bool
+    \item[-] (Bool $\rightarrow$ Bool) $\rightarrow$ Bool
+    \item[-] (Bool $\rightarrow$ Bool) $\rightarrow$ (Bool $\rightarrow$ Bool)
+    \item[-] and so on
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Booleans}
+
+  $ \ha{\true}{a}{b} \rightarrow a $ \\
+  $ \ha{\false}{a}{b} \rightarrow b $
+
+  \vspace{1cm}
+
+  \pause
+
+  $ \text{not} : \bool \rightarrow \bool $ \\
+  $ \text{not} \coloneqq (\lambda b : \bool . \ha{b}{\false}{\true}) $
+
+  \vspace{5mm}
+
+  $ \text{and} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{and} \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{b}{\false}) $ \\
+
+  \vspace{5mm}
+
+  $ \text{or} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{or}  \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{\true}{b}) $ \\
+
+  \vspace{5mm}
+
+  $ \text{xor} : \bool \rightarrow \bool \rightarrow \bool $ \\
+  $ \text{xor} \coloneqq (\lambda a : \bool . \lambda b : \bool . \ha{a}{(\text{not}\ b)}{b}) $ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Natural Numbers}
+
+  $$
+    t \coloneqq \cdots
+      \mid \text{0}
+      \mid \suc{t}
+      \mid \text{rec}\ t\ t\ t
+  $$
+
+  $$ T \coloneqq \bool \mid \nat \mid T \rightarrow T $$
+
+
+  \begin{itemize}
+    \item[-] 0 : Nat
+    \item[-] suc : Nat $\rightarrow$ Nat
+    \item[-] rec : Nat $\rightarrow$ $\tau$ $\rightarrow$ (Nat $\rightarrow$ $\tau$ $\rightarrow$ $\tau$) $\rightarrow$ $\tau$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Natural Numbers}
+
+  $1 \coloneqq \suc{\zero}$ \\
+  $2 \coloneqq \suc{1}$ \\
+  $3 \coloneqq \suc{2}$ \\
+  $\cdots$
+
+  \vspace{1cm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . ???) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: rec}
+
+  $\text{rec} : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+
+  \vspace{5mm}
+
+  $\text{rec}\ 3\ z\ f  $ \\
+  $\rightarrow \rec{2}{(f\ 3\ z)}{f}$ \\
+  $\rightarrow \rec{1}{(f\ 2\ (f\ 3\ z))}{f}$ \\
+  $\rightarrow \rec{\zero}{(f\ 1\ (f\ 2\ (f\ 3\ z)))}{f}$ \\
+  $\rightarrow f\ 1\ (f\ 2\ (f\ 3\ z))$ \\
+
+  \vspace{5mm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda a: \nat . \suc{a})}) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Addition}
+
+  $f : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $f \coloneqq (\lambda k: \nat . \lambda r: \nat . \suc{r})$
+
+  \vspace{5mm}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{f}) $
+
+  \vspace{5mm}
+
+  $\text{add}\ 2\ 3$ \\
+  $\rightarrow (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{f})\ 2\ 3$ \\
+  $\rightarrow \rec{2}{3}{f}$ \\
+  $\rightarrow \rec{1}{(f\ 2\ 3)}{f}$ \\
+  $\rightarrow \rec{\zero}{(f\ 1\ (f\ 2\ 3))}{f}$ \\
+  $\rightarrow f\ 1\ (f\ 2\ 3)$ \\
+  $\rightarrow \suc{(\suc{3})}$ \\
+  $\rightarrow \suc{4}$ \\
+  $\rightarrow 5$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Other Operations}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda r: \nat . \suc{r})}) $
+
+  \vspace{5mm}
+
+  $\text{mul} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  % TODO: this is wrapping, not sure how to make it shorter
+  $mul \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{\zero}{(\lambda k: \nat . \lambda r: \nat . \text{add}\ r\ b)}) $
+
+  \vspace{5mm}
+
+  $\text{isZero} : \nat \rightarrow \bool$ \\
+  $isZero \coloneqq (\lambda n : \nat . \rec{n}{\true}{(\lambda k: \nat . \lambda r: \bool . \false)}) $
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+
+  $\text{add} : \nat \rightarrow \nat \rightarrow \nat$ \\
+  $add \coloneqq (\lambda a : \nat . \lambda b : \nat . \rec{a}{b}{(\lambda k: \nat . \lambda r: \nat . \suc{r})}) $
+  $\rec : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{isZero} : \nat \rightarrow \bool$ \\
+  $isZero \coloneqq (\lambda n : \nat . \rec{n}{\true}{(\lambda k: \nat . \lambda r: \bool . \false)}) $ \\
+  $\rec : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  Every constant must have a single well defined type!
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: The Problem}
+
+  $\rec : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+  $\rec : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  $\text{id} : \bool \rightarrow \bool$ \\
+  $\text{id} : \nat \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{if} : \bool \rightarrow \bool \rightarrow \bool \rightarrow \bool$ \\
+  $\text{if} : \bool \rightarrow \nat \rightarrow \nat \rightarrow \nat$
+  $\text{if} : \bool \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat)$
+
+  \vspace{5mm}
+
+  $\text{example} \coloneqq (\ha{(isZero\ n)}{succ}{pred})\ 5$
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Strictly Typed Lambda Calculus: Limitation}
+
+  $\text{rec}_{\nat} : \nat \rightarrow \nat \rightarrow (\nat \rightarrow \nat \rightarrow \nat) \rightarrow \nat$ \\
+  $\text{rec}_{\bool} : \nat \rightarrow \bool \rightarrow (\nat \rightarrow \bool \rightarrow \bool) \rightarrow \bool$
+
+  \vspace{5mm}
+
+  $\text{id}_{\bool} : \bool \rightarrow \bool$ \\
+  $\text{id}_{\nat} : \nat \rightarrow \nat$
+
+  \vspace{5mm}
+
+  $\text{if}_{\bool} : \bool \rightarrow \bool \rightarrow \bool \rightarrow \bool$ \\
+  $\text{if}_{\nat} : \bool \rightarrow \nat \rightarrow \nat \rightarrow \nat$ \\
+  $\text{if}_{\nat \rightarrow \nat} : \bool \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat) \rightarrow (\nat \rightarrow \nat)$
+
+  \vspace{5mm}
+
+  $\text{example} \coloneqq (\text{if}_{\nat \rightarrow \nat}\ (isZero\ n)\text{ then succ else pred})\ 5$
+\end{frame}
+
+\subsection{System F ($\lambda2$)}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Definitions}
+
+  $$
+    t \coloneqq \cdots
+      \mid \Lambda A . t
+      \mid t\ \{T\}
+  $$
+
+  $$ T \coloneqq \bool \mid T \rightarrow T \mid A \mid \forall A . T $$
+
+  $\text{id} : \forall A . A \rightarrow A$ \\
+  $\text{id} \coloneqq (\Lambda A . \lambda x : A . x)$
+
+  \vspace{5mm}
+
+  $\text{id}_{\nat} : \nat \rightarrow \nat$ \\
+  $\text{id}_{\nat} \coloneqq id\ \{\nat\}$
+
+  \vspace{5mm}
+
+  $\text{id}\ \{\bool\}\ \true \rightarrow \true$ \\
+  $\text{id}\ \{\nat\}\ 3 \rightarrow 3$ \\
+  $\text{id}\ \{\nat \rightarrow \bool\}\ \text{isZero} \rightarrow \text{isZero}$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: We only need 1 of each function now}
+
+   $\text{rec} : \forall T . \nat \rightarrow T \rightarrow (\nat \rightarrow T \rightarrow T) \rightarrow T$ \\
+
+  $\text{id} : \forall T . T \rightarrow T$ \\
+
+  $\text{if} : \forall T . \bool \rightarrow T \rightarrow T \rightarrow T$ \\
+
+  \vspace{5mm}
+
+  This is equivalent to generics in languages such as Java.
+
+  \begin{lstlisting}
+    class JavaExample {
+      <T> T id(T x) { return x; }
+      <T> T if(boolean b, T t, T f) {
+        return b ? t : f;
+      }
+    }
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Complex Example}
+
+  $\text{compose} : \forall A . \forall B . \forall C . (A \rightarrow B) \rightarrow (B \rightarrow C) \rightarrow (A \rightarrow C)$ \\
+  $\text{compose} \coloneqq (\Lambda A . \Lambda B . \Lambda C . \ \lambda f_{ab} : A \rightarrow B . \lambda f_{bc} : B \rightarrow C . \lambda a: A . f_{bc}\ (f_{ab}\ a))$ \\
+
+  \vspace{5mm}
+
+  $\text{lessThan2} : \nat \rightarrow \bool$ \\
+  $\text{lessThan2} \coloneqq compose\ \{\nat\}\ \{\nat\}\ \{\bool\}\ \text{pred}\ \text{isZero}$
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{System F: Church Encodings are Back!}
+
+  $\bool \coloneqq \forall A . A \rightarrow A \rightarrow A$ \\
+  $\true \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . t)$ \\
+  $\false \coloneqq (\Lambda A . \lambda t : A . \lambda f : A . f)$ \\
+
+  \vspace{5mm}
+
+  $\text{not} : \bool \rightarrow \bool$ \\
+  $\text{not} \coloneqq (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)$
+
+  \vspace{5mm}
+
+  $\text{not}\ \false$ \\
+  \pause
+  $\rightarrow (\lambda b : \bool . b\ \{\bool\}\ \false\ \true)\ \false$ \\
+  \pause
+  $\rightarrow (\Lambda A . \lambda t : A . \lambda f : A . f)\ \{\bool\}\ \false\ \true$ \\
+  \pause
+  $\rightarrow (\lambda t : \bool . \lambda f : \bool . f)\ \false\ \true$ \\
+  \pause
+  $\rightarrow (\lambda f : \bool . f)\ \true$ \\
+  \pause
+  $\rightarrow \true$ \\
+
+  \vspace{5mm}
+
+  Since this is not how datatypes are implemented in LEAN, we will continue with the method from STLC and not mention this method again.
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]
+  \frametitle{System F: Limitation}
+
+  We might consider using types such as List, Option, Tuple and so on.
+  While we can define such constructs, we can't really use them as first class citizens.
+
+  \vspace{5mm}
+
+  $ Tuple\ A\ B \coloneqq \forall R. (A \rightarrow B \rightarrow R) \rightarrow R $ \\
+
+  \vspace{5mm}
+
+  We can defined List of Nat or List of Bool, but we can't talk generally about List or Tuple.
+
+\end{frame}
+
+\subsection{Lambda Omega ($\lambda \omega$)}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Definitions}
+
+  $$ K \coloneqq \type \mid K \rightarrow K $$
+
+  $$ T \coloneqq \tau \mid T \rightarrow T \mid A \mid \forall A :: K . T \mid \lambda A :: K . T \mid T\ T $$
+
+  $$
+    t \coloneqq c
+      \mid x
+      \mid (\lambda x : T . t)
+      \mid t\ t
+      \mid (\Lambda A :: K . t)
+      \mid t\ \{T\}
+  $$
+
+  \vspace{5mm}
+
+  $\text{id} : \forall T :: Type . T \rightarrow T$ \\
+  $\text{id} \coloneqq (\Lambda A :: Type . \lambda x : A . x)$ \\
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Defining Option}
+
+  $Option :: Type \rightarrow Type$ \\
+  $Option \coloneqq \lambda A :: Type . \forall R :: Type . R \rightarrow (A \rightarrow R) \rightarrow R$ \\
+
+  \vspace{5mm}
+
+  $none : \forall A :: Type . Option\ A$ \\
+  $none : (\Lambda A :: Type . \Lambda R :: Type . \lambda n : R . \lambda s : A \rightarrow R . n)$
+
+  \vspace{5mm}
+
+  $some : \forall A :: Type . A \rightarrow Option\ A$
+  $some \coloneqq (\Lambda A :: Type . \lambda a:A . \Lambda R :: Type . \lambda n : R . \lambda s : A\rightarrow R . s\ a)$
+
+  \vspace{5mm}
+
+  $map : \forall A :: Type . \forall B :: Type . (A \rightarrow B) \rightarrow Option\ A \rightarrow Option\ B$
+  $map \coloneqq \cdots $
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Higher Kinded Types}
+
+  $map : \forall F :: Type \rightarrow Type . \ \forall A :: Type . \forall B :: Type . (A \rightarrow B) \rightarrow F\ A \rightarrow F\ B$
+
+  \vspace{1cm}
+
+  We have the power to express higher kinded types from Haskell!
+
+  \begin{lstlisting}
+    map : (a -> b) -> f a -> f b
+  \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Lambda Omega: Limitation}
+
+  While we can define a variety of types, we can't define a type that depends on a term.
+  The classic example is to have a Vector of exact length n.
+
+  \vspace{1cm}
+
+  $Vector :: \nat \rightarrow Type \rightarrow Type $ \\
+  $example: Vector\ 5\ \nat$
+
+\end{frame}
+
+\subsection{Lambda P ($\lambda \Pi$)}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Definition}
+
+  $$
+    T \coloneqq \tau
+      \mid T \rightarrow T
+      \mid A
+      \mid \forall A . T
+      \mid \lambda A . T
+      \mid T\ T
+      \mid \Pi x : T . T
+      \mid Type
+  $$
+
+  $$
+    t \coloneqq c
+      \mid x
+      \mid (\lambda x : T . t)
+      \mid t\ t
+      \mid (\Lambda A : T . t)
+      \mid t\ \{T\}
+  $$
+
+  \vspace{5mm}
+
+  Kinds are merged into types, and a function is added that takes a term and produces a type.
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Example}
+  $boolOrNat : \Pi x : Bool . \ha{b}{Bool}{Nat}$ \\
+  $boolOrNat \coloneqq (\lambda b : Bool . \ha{b}{false}{0})$
+
+  \vspace{1cm}
+
+  $(\Pi x : Bool . \ha{b}{Bool}{Nat})\ false$ \\
+  $\rightarrow \ha{false}{Bool}{Nat}$\\
+  $\rightarrow Nat$
+
+  \vspace{5mm}
+
+  $boolOrNat\ false$\\
+  $\rightarrow (\lambda b : Bool . \ha{b}{false}{0})\ false$\\
+  $\rightarrow \ha{false}{false}{0}$\\
+  $\rightarrow 0$\\
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Lambda Pi: Calculus of Constructions}
+
+  We have reached the Calculus of Constructions. We are fully able to prove theorems with what we have. Now there are only a few steps until we reach LEAN.
+
+  \vspace{5mm}
+
+  $$(\lambda n : Nat . n + 0 = n)$$
+
+  \vspace{5mm}
+
+  We just need to add a couple of features, such as universes and a way to create types. We will not get too into those, since it is time to actually get introduced to LEAN.
+
+  $$42 : Nat : Type : Type 1 : Type 2 : \cdots$$
+
+\end{frame}
+
+\section{Lean}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge LEAN}
+  \vfill
+\end{frame}
+
+\subsection{What is LEAN?}
+
+\begin{frame}
+  \frametitle{What is LEAN?}
+
+  Lean is an all purpose programming language designed by Leonardo de Moura and mantained by the Lean Focused Research Organization.
+
+  \vspace{5mm}
+
+  The first version of Lean was released in 2013, and the version that is used now (Lean 4) was released 10 years later.
+
+  \vspace{5mm}
+
+  Lean has been used to verify a number of theorems recently.
+
+\end{frame}
+
+\subsection{Compilation}
+
+\begin{frame}
+  \frametitle{LEAN: Compilation and Elaboration}
+
+  Lean is a compiled language. Here are the main steps:
+
+  \begin{enumerate}
+    \item \textbf{Parsing} Parses code into a syntax.
+    \item \textbf{Macro Expansion} Applies syntax changes.
+    \item \textbf{Elaboration} Transform syntax into code type theory.
+    \item \textbf{Kernel Checking} Verify if the result of elaboration follows the rules of type theory.
+    \item \textbf{Compilation} Compile to binary (C).
+  \end{enumerate}
+\end{frame}
+
+\subsection{Types}
+
+\begin{frame}
+  \frametitle{LEAN: Types}
+
+  Lean comes with a number of predefined types such as Nat, Int, String, List, Option and so on.
+
+  \vspace{1cm}
+
+  Lean uses Algebraic Data Types (ADT), a way to build new types by combining existing types.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Structures}
+
+  \begin{lstlisting}[language=lean]
+    structure Person where
+      name : String
+      age : Nat
+
+    def leo := Person.mk "Leonardo" 42 -- default constructor
+    def name := Person.name leo
+    def age := Person.age leo
+
+    -- evaluate the result and print
+    #eval leo -- { name := "Leonardo", age := 42 }
+
+    -- typecheck
+    #check leo -- leo : Person
+
+    #eval name -- "Leonardo"
+    #check name -- name : String
+
+    #eval age -- 42
+    #check age -- age : Nat
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Structures with Generics}
+
+  \begin{lstlisting}[language=lean]
+    structure MyProduct (α β : Type) where
+      create :: -- custom constructor
+      fst : α
+      snd : β
+
+    def tuple := MyProduct.create (23 : Nat) "lol"
+    def number := MyProduct.fst tuple
+    def string := MyProduct.snd tuple
+
+    #eval tuple --  { fst := 23, snd := "lol" }
+    #check tuple -- tuple : MyProduct Nat String
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Bool}
+
+  \begin{lstlisting}[language=lean]
+    inductive Boolean where
+      | true : Boolean
+      | false : Boolean
+
+    def isMyComputerOn := Boolean.true
+
+    #eval isMyComputerOn -- Boolean.true
+    #check isMyComputerOn -- isMyComputerOn : Boolean
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Unit}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyUnit where
+      | unit : MyUnit
+
+    def myUnit := MyUnit.unit
+
+    #eval myUnit -- Unit.unit
+    #check myUnit -- myUnit : MyUnit
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Void}
+
+  \begin{lstlisting}[language=lean]
+    inductive Void where
+
+    -- you can't have a value of type void because
+    -- there are no constructors
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Option}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyOption α where
+      | some : α → MyOption α
+      | none : MyOption α
+
+    def something := some "Hello"
+    #check something -- Option String
+
+    def nothing : Option Nat := none
+    #check nothing -- Option Nat
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: List}
+
+  \begin{lstlisting}[language=lean]
+    inductive MyList α where
+      | cons : α → MyList α → MyList α
+      | nil : MyList α
+
+    def emptyList : MyList String := MyList.nil
+
+    def oneElement := MyList.cons 1 MyList.nil
+
+    def twoElements := MyList.cons 2 (MyList.cons 1 MyList.nil)
+
+    -- Lean lists have sugaring for lists, so they look like this:
+
+    def realEmpty : List String := []
+
+    def realElements := [1, 2, 3, 4]
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Functions}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Functions}
+
+  \begin{lstlisting}[language=lean]
+    def myId (x : α) : α := x
+    #eval myId 123 -- 123
+
+    def add1 (x : Nat) : Nat := x + 1
+    #eval add1 2 -- 3
+
+    def add (a : Nat) (b : Nat) : Nat := a + b
+    #eval add 5 2 -- 7
+
+    def myNot (b : Bool) : Bool := if b then false else true
+    #eval myNot true -- false
+
+    def myFunc (n : Nat) (f : Nat -> Nat) (g : Nat -> Nat) : (Nat -> Nat) :=
+      if n == 0 then f else g
+
+    #eval (myFunc 3 Nat.succ Nat.pred) 4 -- 3
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Lambda Functions}
+
+  \begin{lstlisting}[language=lean]
+    def add1 : Nat → Nat := λ x => x + 1
+
+    #eval (λ x => x) 5 -- 5
+
+    #eval List.map (λ n => n * n) [1, 2, 3] -- [1, 4, 9]
+
+    #eval List.filter (λ e => e % 2 == 0) [1,2,3,4,5,6]
+    -- [2, 4, 6]
+
+  \end{lstlisting}
+\end{frame}
+
+% AI: generated by Claude
+\subsection{Implicit Arguments}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Implicit Arguments}
+
+  \begin{lstlisting}[language=lean]
+    -- explicit: we must supply the type ourselves
+    def myId1 (T : Type) (x : T) : T := x
+    #eval myId1 Nat 5 -- 5
+
+    -- implicit: Lean infers it from the argument
+    def myId2 {T : Type} (x : T) : T := x
+    #eval myId2 5      -- 5, T := Nat inferred
+    #eval myId2 "hi"   -- "hi", T := String inferred
+
+    -- force it to be explicit anyway with @
+    #eval @myId2 Nat 5 -- 5
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Typeclasses}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Typeclasses}
+
+  \begin{lstlisting}[language=lean]
+    class Greet (α : Type) where
+      greet : α → String
+
+    instance : Greet Nat where
+      greet n := s!"Hello, number {n}!"
+
+    instance : Greet Bool where
+      greet b := if b then "Hello, true!" else "Hello, false!"
+
+    def greetIt {α : Type} [Greet α] (x : α) : String := Greet.greet x
+
+    #eval greetIt (5 : Nat)   -- "Hello, number 5!"
+    #eval greetIt true        -- "Hello, true!"
+  \end{lstlisting}
+
+\end{frame}
+
+\subsection{Recursion}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Recursion}
+
+  \begin{lstlisting}[language=lean]
+    def factorial (n : Nat) : Nat :=
+      if n == 0 then 1 else n * factorial (n - 1)
+
+    #eval factorial 5 -- 120
+
+    def length (xs : List α) : Nat :=
+      match xs with
+      | [] => 0
+      | _ :: rest => 1 + length rest
+
+    #eval length [1, 2, 3, 4] -- 4
+  \end{lstlisting}
+
+  \vspace{5mm}
+
+  Lean checks that recursive functions always terminate.
+\end{frame}
+
+\subsection{Pattern Matching}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Pattern Matching}
+
+  \begin{lstlisting}[language=lean]
+    def describe (n : Nat) : String :=
+      match n with
+      | 0 => "zero"
+      | 1 => "one"
+      | _ => "many"
+
+    #eval describe 7 -- "many"
+
+    def firstTwo (xs : List Nat) : String :=
+      match xs with
+      | [] => "empty"
+      | [x] => s!"one element: {x}"
+      | x :: y :: _ => s!"starts with {x}, {y}"
+
+    #eval firstTwo [1, 2, 3] -- "starts with 1, 2"
+
+    def safeDiv (a b : Nat) : Option Nat :=
+      match b with
+      | 0 => none
+      | _ => some (a / b)
+
+    #eval safeDiv 10 2 -- some 5
+    #eval safeDiv 10 0 -- none
+  \end{lstlisting}
+\end{frame}
+
+\subsection{Dependent Types}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: Dependent Types}
+
+  \begin{lstlisting}[language=lean]
+    def boolOrNat : (b : Bool) → (λ x => if x then Bool else Nat) b
+    | true  => false
+    | false => (0 : Nat)
+  \end{lstlisting}
+
+  \vspace{5mm}
+
+  The return \textbf{type} itself depends on the \textbf{value} of \texttt{b}. This is the $\Pi$-type from the Lambda Pi section, put to work: Lean's type system is built directly on it.
+\end{frame}
+
+\subsection{Proofs}
+
+\begin{frame}
+  \frametitle{LEAN: Propositions are Types}
+
+  So far Lean has looked like an ordinary functional language: types, structures, functions, recursion.
+
+  \vspace{5mm}
+
+  But recall the Calculus of Constructions from earlier: a statement like $2 + 2 = 4$ is itself just a \textbf{type}, and a \textbf{proof} of it is just a \textbf{term} of that type.
+
+  \vspace{5mm}
+
+  This means Lean can check proofs exactly the way it checks any other program.
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{LEAN: A Proof of Equality}
+
+  \begin{lstlisting}[language=lean]
+    inductive Eq : α → β → Prop where
+      | refl : (a : α) → Eq a a
+
+    -- you can't have something like Eq 1 2 (1 = 2)
+    -- because it's impossible to construct
+
+    theorem trans (h_ab : Eq a b) (h_bc : Eq b c) : Eq a c :=
+      match h_ab with
+      | Eq.refl a => h_bc -- this is the branch where a = b
+  \end{lstlisting}
+
+  \vspace{5mm}
+
+  We will explore how (and how far) this goes in the next session.
+\end{frame}
+
+\begin{frame}
+  \centering
+  \vfill
+  {\Huge Thank You!}
+  \vfill
+\end{frame}
+
+\end{document}
